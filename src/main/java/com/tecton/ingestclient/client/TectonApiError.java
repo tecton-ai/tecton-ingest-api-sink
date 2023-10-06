@@ -1,274 +1,282 @@
 package com.tecton.ingestclient.client;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.List;
+
 /**
- * Represents an error response from the Tecton API.
- * This class is used for deserialising JSON error responses from the API.
+ * Represents an error response from the Tecton API. Used for deserialising JSON error responses
+ * from the API.
  */
 public class TectonApiError {
 
-    @JsonProperty("requestError")
-    private RequestError requestError;
+  @JsonProperty("requestError")
+  private RequestError requestError;
 
-    @JsonProperty("workspaceName")
-    private String workspaceName;
+  @JsonProperty("workspaceName")
+  private String workspaceName;
 
-    @JsonProperty("recordErrors")
-    private List<RecordError> recordErrors;
+  @JsonProperty("recordErrors")
+  private List<RecordError> recordErrors;
+
+  private static final ObjectMapper MAPPER = new ObjectMapper();
+
+  /**
+   * Default constructor. Intended for Jackson deserialisation.
+   */
+  public TectonApiError() {
+    // Left blank for Jackson deserialisation
+  }
+
+  /**
+   * Retrieves the request error details.
+   * 
+   * @return the request error details.
+   */
+  public RequestError getRequestError() {
+    return requestError;
+  }
+
+  /**
+   * Sets the request error details.
+   *
+   * @param requestError the details to set.
+   */
+  public void setRequestError(RequestError requestError) {
+    this.requestError = requestError;
+  }
+
+  /**
+   * Retrieves the workspace name.
+   * 
+   * @return the workspace name.
+   */
+  public String getWorkspaceName() {
+    return workspaceName;
+  }
+
+  /**
+   * Sets the workspace name.
+   *
+   * @param workspaceName the name to set.
+   */
+  public void setWorkspaceName(String workspaceName) {
+    this.workspaceName = workspaceName;
+  }
+
+  /**
+   * Retrieves the list of record errors.
+   * 
+   * @return the list of record errors.
+   */
+  public List<RecordError> getRecordErrors() {
+    return recordErrors;
+  }
+
+  /**
+   * Sets the list of record errors.
+   *
+   * @param recordErrors the list to set.
+   */
+  public void setRecordErrors(List<RecordError> recordErrors) {
+    this.recordErrors = recordErrors;
+  }
+
+  /**
+   * Converts this instance into its JSON representation.
+   *
+   * @return the JSON representation or a descriptive error string if conversion fails.
+   */
+  @Override
+  public String toString() {
+    return toJson(this);
+  }
+
+  /**
+   * Converts an object into its JSON representation.
+   *
+   * @param obj the object to convert.
+   * @return the JSON representation or a descriptive error string if conversion fails.
+   */
+  private static String toJson(Object obj) {
+    try {
+      return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+    } catch (JsonProcessingException e) {
+      return "Error converting to JSON";
+    }
+  }
+
+  /**
+   * Represents the request error details in a Tecton API error response.
+   */
+  public static class RequestError {
+
+    @JsonProperty("errorMessage")
+    private String errorMessage;
+
+    @JsonProperty("errorType")
+    private String errorType;
 
     /**
-     * Default constructor used by Jackson for deserialization.
+     * Default constructor. Intended for Jackson deserialisation.
      */
-    public TectonApiError() {}
-
-    /**
-     * Gets the request error.
-     * 
-     * @return the {@link RequestError}.
-     */
-    public RequestError getRequestError() {
-        return requestError;
+    public RequestError() {
+      // Left blank for Jackson deserialisation
     }
 
     /**
-     * Sets the request error.
-     * 
-     * @param requestError the {@link RequestError} to set.
+     * Retrieves the error message.
+     *
+     * @return the error message.
      */
-    public void setRequestError(RequestError requestError) {
-        this.requestError = requestError;
+    public String getErrorMessage() {
+      return errorMessage;
     }
 
     /**
-     * Gets the workspace name.
-     * 
-     * @return the workspace name.
+     * Sets the error message.
+     *
+     * @param errorMessage the message to set.
      */
-    public String getWorkspaceName() {
-        return workspaceName;
+    public void setErrorMessage(String errorMessage) {
+      this.errorMessage = errorMessage;
     }
 
     /**
-     * Sets the workspace name.
+     * Retrieves the error type.
      * 
-     * @param workspaceName the workspace name to set.
+     * @return the error type.
      */
-    public void setWorkspaceName(String workspaceName) {
-        this.workspaceName = workspaceName;
+    public String getErrorType() {
+      return errorType;
     }
 
     /**
-     * Gets the list of record errors.
-     * 
-     * @return the list of {@link RecordError}.
+     * Sets the error type.
+     *
+     * @param errorType the type to set.
      */
-    public List<RecordError> getRecordErrors() {
-        return recordErrors;
+    public void setErrorType(String errorType) {
+      this.errorType = errorType;
     }
 
     /**
-     * Sets the list of record errors.
-     * 
-     * @param recordErrors the list of {@link RecordError} to set.
-     */
-    public void setRecordErrors(List<RecordError> recordErrors) {
-        this.recordErrors = recordErrors;
-    }
-
-    /**
-     * Represents the current object as a string.
-     * 
-     * @return the string representation of the object.
+     * Converts this instance into its JSON representation.
+     *
+     * @return the JSON representation or a descriptive error string if conversion fails.
      */
     @Override
     public String toString() {
-        return toJson(this);
+      return toJson(this);
+    }
+  }
+
+  /**
+   * Represents individual record error details in a Tecton API error response.
+   */
+  public static class RecordError {
+
+    @JsonProperty("featureViewName")
+    private String featureViewName;
+
+    @JsonProperty("pushSourceName")
+    private String pushSourceName;
+
+    @JsonProperty("errorType")
+    private String errorType;
+
+    @JsonProperty("errorMessage")
+    private String errorMessage;
+
+    /**
+     * Default constructor. Intended for Jackson deserialisation.
+     */
+    public RecordError() {
+      // Left blank for Jackson deserialisation
     }
 
     /**
-     * Converts the given object to its JSON representation.
+     * Retrieves the feature view name.
+     * 
+     * @return the feature view name.
+     */
+    public String getFeatureViewName() {
+      return featureViewName;
+    }
+
+    /**
+     * Sets the feature view name.
      *
-     * @param obj the object to convert to JSON.
-     * @return the JSON string representation of the object.
+     * @param featureViewName the name to set.
      */
-    private static String toJson(Object obj) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            return "Error converting to JSON";
-        }
+    public void setFeatureViewName(String featureViewName) {
+      this.featureViewName = featureViewName;
     }
 
     /**
-     * Represents the request error details in a Tecton API error response.
+     * Retrieves the push source name.
+     * 
+     * @return the push source name.
      */
-    public static class RequestError {
-
-        @JsonProperty("errorMessage")
-        private String errorMessage;
-
-        @JsonProperty("errorType")
-        private String errorType;
-
-        /**
-         * Default constructor used by Jackson for deserialization.
-         */
-        public RequestError() {}
-
-        /**
-         * Gets the error message.
-         * 
-         * @return the error message.
-         */
-        public String getErrorMessage() {
-            return errorMessage;
-        }
-
-        /**
-         * Sets the error message.
-         * 
-         * @param errorMessage the error message to set.
-         */
-        public void setErrorMessage(String errorMessage) {
-            this.errorMessage = errorMessage;
-        }
-
-        /**
-         * Gets the error type.
-         * 
-         * @return the error type.
-         */
-        public String getErrorType() {
-            return errorType;
-        }
-
-        /**
-         * Sets the error type.
-         * 
-         * @param errorType the error type to set.
-         */
-        public void setErrorType(String errorType) {
-            this.errorType = errorType;
-        }
-
-        /**
-         * Represents the current object as a string.
-         * 
-         * @return the string representation of the object.
-         */
-        @Override
-        public String toString() {
-            return toJson(this);
-        }
+    public String getPushSourceName() {
+      return pushSourceName;
     }
 
     /**
-     * Represents the record error details in a Tecton API error response.
+     * Sets the push source name.
+     *
+     * @param pushSourceName the name to set.
      */
-    public static class RecordError {
-
-        @JsonProperty("featureViewName")
-        private String featureViewName;
-
-        @JsonProperty("pushSourceName")
-        private String pushSourceName;
-
-        @JsonProperty("errorType")
-        private String errorType;
-
-        @JsonProperty("errorMessage")
-        private String errorMessage;
-
-        /**
-         * Default constructor used by Jackson for deserialization.
-         */
-        public RecordError() {}
-
-        /**
-         * Gets the feature view name.
-         * 
-         * @return the feature view name.
-         */
-        public String getFeatureViewName() {
-            return featureViewName;
-        }
-
-        /**
-         * Sets the feature view name.
-         * 
-         * @param featureViewName the feature view name to set.
-         */
-        public void setFeatureViewName(String featureViewName) {
-            this.featureViewName = featureViewName;
-        }
-
-        /**
-         * Gets the push source name.
-         * 
-         * @return the push source name.
-         */
-        public String getPushSourceName() {
-            return pushSourceName;
-        }
-
-        /**
-         * Sets the push source name.
-         * 
-         * @param pushSourceName the push source name to set.
-         */
-        public void setPushSourceName(String pushSourceName) {
-            this.pushSourceName = pushSourceName;
-        }
-
-        /**
-         * Gets the error type.
-         * 
-         * @return the error type.
-         */
-        public String getErrorType() {
-            return errorType;
-        }
-
-        /**
-         * Sets the error type.
-         * 
-         * @param errorType the error type to set.
-         */
-        public void setErrorType(String errorType) {
-            this.errorType = errorType;
-        }
-
-        /**
-         * Gets the error message.
-         * 
-         * @return the error message.
-         */
-        public String getErrorMessage() {
-            return errorMessage;
-        }
-
-        /**
-         * Sets the error message.
-         * 
-         * @param errorMessage the error message to set.
-         */
-        public void setErrorMessage(String errorMessage) {
-            this.errorMessage = errorMessage;
-        }
-
-        /**
-         * Represents the current object as a string.
-         * 
-         * @return the string representation of the object.
-         */
-        @Override
-        public String toString() {
-            return toJson(this);
-        }
+    public void setPushSourceName(String pushSourceName) {
+      this.pushSourceName = pushSourceName;
     }
+
+    /**
+     * Retrieves the error type.
+     * 
+     * @return the error type.
+     */
+    public String getErrorType() {
+      return errorType;
+    }
+
+    /**
+     * Sets the error type.
+     *
+     * @param errorType the type to set.
+     */
+    public void setErrorType(String errorType) {
+      this.errorType = errorType;
+    }
+
+    /**
+     * Retrieves the error message.
+     * 
+     * @return the error message.
+     */
+    public String getErrorMessage() {
+      return errorMessage;
+    }
+
+    /**
+     * Sets the error message.
+     *
+     * @param errorMessage the message to set.
+     */
+    public void setErrorMessage(String errorMessage) {
+      this.errorMessage = errorMessage;
+    }
+
+    /**
+     * Converts this instance into its JSON representation.
+     *
+     * @return the JSON representation or a descriptive error string if conversion fails.
+     */
+    @Override
+    public String toString() {
+      return toJson(this);
+    }
+  }
 }
