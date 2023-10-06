@@ -44,7 +44,7 @@ replay_pid*
 ### Eclipse ###
 
 .metadata
-bin/
+#bin/
 tmp/
 *.tmp
 *.bak
