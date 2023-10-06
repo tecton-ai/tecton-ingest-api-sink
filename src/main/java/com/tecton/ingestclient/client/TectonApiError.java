@@ -21,7 +21,7 @@ public class TectonApiError {
   @JsonProperty("recordErrors")
   private List<RecordError> recordErrors;
 
-  private static final ObjectMapper MAPPER = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   /**
    * Default constructor. Intended for Jackson deserialisation.
@@ -102,7 +102,7 @@ public class TectonApiError {
    */
   private static String toJson(Object obj) {
     try {
-      return MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+      return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
     } catch (JsonProcessingException e) {
       return "Error converting to JSON";
     }

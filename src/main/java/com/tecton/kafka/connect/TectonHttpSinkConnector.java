@@ -28,79 +28,79 @@ import java.util.Map;
 @DocumentationNote("Refer to the official Tecton documentation for more details.")
 public class TectonHttpSinkConnector extends SinkConnector {
 
-    private static final Logger log = LoggerFactory.getLogger(TectonHttpSinkConnector.class);
-    
-    private Map<String, String> settings;
+  private static final Logger log = LoggerFactory.getLogger(TectonHttpSinkConnector.class);
 
-    /**
-     * Returns a set of configurations for the tasks based on the current configuration.
-     *
-     * @param maxTasks the maximum number of configurations to generate
-     * @return a list of configuration maps, one map for each task
-     */
-    @Override
-    public List<Map<String, String>> taskConfigs(int maxTasks) {
-        log.info("Configuring {} tasks for the connector", maxTasks);
+  private Map<String, String> settings;
 
-        List<Map<String, String>> configs = new ArrayList<>();
-        for (int i = 0; i < maxTasks; i++) {
-            configs.add(this.settings);
-        }
-        return configs;
+  /**
+   * Returns a set of configurations for the tasks based on the current configuration.
+   *
+   * @param maxTasks the maximum number of configurations to generate
+   * @return a list of configuration maps, one map for each task
+   */
+  @Override
+  public List<Map<String, String>> taskConfigs(int maxTasks) {
+    log.info("Configuring {} tasks for the connector", maxTasks);
+
+    List<Map<String, String>> configs = new ArrayList<>();
+    for (int i = 0; i < maxTasks; i++) {
+      configs.add(this.settings);
     }
+    return configs;
+  }
 
-    /**
-     * Starts the connector by initializing the necessary resources.
-     *
-     * @param settings the configuration settings
-     */
-    @Override
-    public void start(Map<String, String> settings) {
-        log.info("Starting the TectonHttpSinkConnector");
-        
-        this.settings = settings;
-        new TectonHttpSinkConnectorConfig(settings);
+  /**
+   * Starts the connector by initializing the necessary resources.
+   *
+   * @param settings the configuration settings
+   */
+  @Override
+  public void start(Map<String, String> settings) {
+    log.info("Starting the TectonHttpSinkConnector");
 
-        // Further setup for the connector if needed
-    }
+    this.settings = settings;
+    new TectonHttpSinkConnectorConfig(settings);
 
-    /**
-     * Stops the connector and releases the allocated resources.
-     */
-    @Override
-    public void stop() {
-        log.info("Stopping the TectonHttpSinkConnector");
-        // Clean-up activities when stopping the connector
-    }
+    // Further setup for the connector if needed
+  }
 
-    /**
-     * Defines the configuration for the connector.
-     *
-     * @return the configuration definition for the connector
-     */
-    @Override
-    public ConfigDef config() {
-        return TectonHttpSinkConnectorConfig.config();
-    }
+  /**
+   * Stops the connector and releases the allocated resources.
+   */
+  @Override
+  public void stop() {
+    log.info("Stopping the TectonHttpSinkConnector");
+    // Clean-up activities when stopping the connector
+  }
 
-    /**
-     * Returns the Task implementation for the connector.
-     *
-     * @return the class of the Task implementation
-     */
-    @Override
-    public Class<? extends Task> taskClass() {
-        return TectonHttpSinkTask.class;
-    }
+  /**
+   * Defines the configuration for the connector.
+   *
+   * @return the configuration definition for the connector
+   */
+  @Override
+  public ConfigDef config() {
+    return TectonHttpSinkConnectorConfig.config();
+  }
 
-    /**
-     * Returns the version of the connector.
-     *
-     * @return the version string
-     */
-    @Override
-    public String version() {
-        // It's important to handle versioning carefully for future compatibility
-        return VersionUtil.version(this.getClass());
-    }
+  /**
+   * Returns the Task implementation for the connector.
+   *
+   * @return the class of the Task implementation
+   */
+  @Override
+  public Class<? extends Task> taskClass() {
+    return TectonHttpSinkTask.class;
+  }
+
+  /**
+   * Returns the version of the connector.
+   *
+   * @return the version string
+   */
+  @Override
+  public String version() {
+    // It's important to handle versioning carefully for future compatibility
+    return VersionUtil.version(this.getClass());
+  }
 }

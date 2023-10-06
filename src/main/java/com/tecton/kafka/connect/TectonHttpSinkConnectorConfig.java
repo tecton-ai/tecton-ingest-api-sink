@@ -43,41 +43,39 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
   private static final String LOGGING_EVENT_DATA_ENABLED_CONFIG =
       "tecton.logging.event.data.enabled";
 
-//HTTP-related Documentation
- static final String HTTP_CLUSTER_ENDPOINT_DOC = 
-     "The endpoint of your Tecton cluster, formatted as: https://<your_cluster>.tecton.ai.";
- static final String HTTP_AUTH_TOKEN_DOC = 
-     "The authorisation token used to authenticate requests to the Stream Ingest API.";
- static final String HTTP_CONNECT_TIMEOUT_DOC = 
-     "The HTTP connect timeout for the Tecton API, in seconds.";
- static final String HTTP_REQUEST_TIMEOUT_DOC = 
-     "The timeout for the HTTP request to Tecton's Ingest API, in seconds.";
- static final String HTTP_ASYNC_ENABLED_DOC = 
-     "Enables HTTP asynchronous sending for concurrent invocations. The default is true.";
- static final String HTTP_CONCURRENCY_LIMIT_DOC = 
-     "Limits the number of concurrent HTTP requests when async is enabled. The default is 50.";
+  // HTTP-related Documentation
+  static final String HTTP_CLUSTER_ENDPOINT_DOC =
+      "The endpoint of your Tecton cluster, formatted as: https://<your_cluster>.tecton.ai.";
+  static final String HTTP_AUTH_TOKEN_DOC =
+      "The authorisation token used to authenticate requests to the Stream Ingest API.";
+  static final String HTTP_CONNECT_TIMEOUT_DOC =
+      "The HTTP connect timeout for the Tecton API, in seconds.";
+  static final String HTTP_REQUEST_TIMEOUT_DOC =
+      "The timeout for the HTTP request to Tecton's Ingest API, in seconds.";
+  static final String HTTP_ASYNC_ENABLED_DOC =
+      "Enables HTTP asynchronous sending for concurrent invocations. The default is true.";
+  static final String HTTP_CONCURRENCY_LIMIT_DOC =
+      "Limits the number of concurrent HTTP requests when async is enabled. The default is 50.";
 
- // Tecton Payload-related Documentation
- static final String WORKSPACE_NAME_DOC = 
-     "The name of the workspace in Tecton.";
- static final String PUSH_SOURCE_NAME_DOC = 
-     "The name of the Tecton Push Source.";
- static final String DRY_RUN_ENABLED_DOC = 
-     "If set to true, the connector will not actually send data.";
- static final String BATCH_MAX_SIZE_DOC = 
-     "The maximum size of the batch of events sent to Tecton. The default is 10.";
+  // Tecton Payload-related Documentation
+  static final String WORKSPACE_NAME_DOC = "The name of the workspace in Tecton.";
+  static final String PUSH_SOURCE_NAME_DOC = "The name of the Tecton Push Source.";
+  static final String DRY_RUN_ENABLED_DOC =
+      "If set to true, the connector will not actually send data.";
+  static final String BATCH_MAX_SIZE_DOC =
+      "The maximum size of the batch of events sent to Tecton. The default is 10.";
 
- // Kafka-related Documentation
- static final String KAFKA_TIMESTAMP_ENABLED_DOC = 
-     "Indicates whether to include the Kafka timestamp in the Tecton record.";
- static final String KAFKA_KEY_ENABLED_DOC = 
-     "Indicates whether to include the Kafka key in the Tecton record.";
- static final String KAFKA_HEADERS_ENABLED_DOC = 
-     "Indicates whether to include the Kafka headers in the Tecton record.";
+  // Kafka-related Documentation
+  static final String KAFKA_TIMESTAMP_ENABLED_DOC =
+      "Indicates whether to include the Kafka timestamp in the Tecton record.";
+  static final String KAFKA_KEY_ENABLED_DOC =
+      "Indicates whether to include the Kafka key in the Tecton record.";
+  static final String KAFKA_HEADERS_ENABLED_DOC =
+      "Indicates whether to include the Kafka headers in the Tecton record.";
 
- // Logging Documentation
- static final String LOGGING_EVENT_DATA_ENABLED_DOC = 
-     "Determines whether the event data should be logged for debugging purposes. The default is false.";
+  // Logging Documentation
+  static final String LOGGING_EVENT_DATA_ENABLED_DOC =
+      "Determines whether the event data should be logged for debugging purposes. The default is false.";
 
   // Configuration parameters
   public final String httpAuthToken;
@@ -155,7 +153,7 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
             .importance(MEDIUM)
             .defaultValue(50)
             .build())
-        
+
         // Tecton payload related configurations
         .define(ConfigKeyBuilder.of(WORKSPACE_NAME_CONFIG, STRING)
             .documentation(WORKSPACE_NAME_DOC)
@@ -192,7 +190,7 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
             .importance(MEDIUM)
             .defaultValue(false)
             .build())
-        
+
         // Logging-related configurations
         .define(ConfigKeyBuilder.of(LOGGING_EVENT_DATA_ENABLED_CONFIG, BOOLEAN)
             .documentation(LOGGING_EVENT_DATA_ENABLED_DOC)

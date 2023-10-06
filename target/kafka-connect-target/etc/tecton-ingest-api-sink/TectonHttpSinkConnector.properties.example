@@ -1,20 +1,20 @@
 # Connector class configuration
 name=tecton-ingest-api-sink
-topics=transactions_json_sr
+topics=<source-topics>
 tasks.max=1
 connector.class=com.tecton.kafka.connect.TectonHttpSinkConnector
 
 # Tecton HTTP-related configurations
-tecton.http.cluster.endpoint=https://preview.spark.tecton.ai
-tecton.http.auth.token=786e9eda37ec8e899954efed6256864b
+tecton.http.cluster.endpoint=https://<tecton-cluster-endpoint>
+tecton.http.auth.token=<auth-token>
 tecton.http.connect.timeout=30
 tecton.http.request.timeout=30
 tecton.http.async.enabled=true
 tecton.http.concurrency.limit=50
 
 # Tecton payload related configurations
-tecton.workspace.name=jon-live
-tecton.push.source.name=transactions_source
+tecton.workspace.name=<workspace-name>
+tecton.push.source.name=<push-source-name>
 tecton.dry.run.enabled=false
 tecton.batch.max.size=10
 
@@ -25,4 +25,4 @@ tecton.kafka.key.enabled=true
 include.kafka.headers=false
 
 # Logging configuration
-tecton.logging.event.data.enabled=true
+tecton.logging.event.data.enabled=false

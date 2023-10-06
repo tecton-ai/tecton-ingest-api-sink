@@ -1,4 +1,7 @@
 /Users/jvarley/Documents/projects-eclipse/tecton-ingest-api-sink/src/test/java/com/tecton/ingest/api/sink/TectonHttpSinkTaskIT.java
 /Users/jvarley/Documents/projects-eclipse/tecton-ingest-api-sink/src/test/java/com/tecton/ingest/api/sink/TectonHttpSinkConnectorTest.java
 /Users/jvarley/Documents/projects-eclipse/tecton-ingest-api-sink/src/test/java/com/tecton/ingestclient/converter/TectonRecordTest.java
+/Users/jvarley/Documents/projects-eclipse/tecton-ingest-api-sink/src/test/java/com/tecton/ingestclient/client/TectonApiRequestTest.java
+/Users/jvarley/Documents/projects-eclipse/tecton-ingest-api-sink/src/test/java/com/tecton/ingestclient/client/TectonApiErrorTest.java
+/Users/jvarley/Documents/projects-eclipse/tecton-ingest-api-sink/src/test/java/com/tecton/ingestclient/client/TectonApiResponseTest.java
 /Users/jvarley/Documents/projects-eclipse/tecton-ingest-api-sink/src/test/java/com/tecton/ingest/api/sink/TectonHttpSinkTaskTest.java

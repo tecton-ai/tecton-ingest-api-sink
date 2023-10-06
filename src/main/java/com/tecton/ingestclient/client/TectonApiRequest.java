@@ -142,6 +142,9 @@ public class TectonApiRequest {
      * @return this builder.
      */
     public Builder workspaceName(String workspaceName) {
+      if (workspaceName == null) {
+        throw new NullPointerException("Workspace name cannot be null.");
+      }
       this.workspaceName = workspaceName;
       return this;
     }

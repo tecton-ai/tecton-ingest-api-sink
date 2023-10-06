@@ -1,0 +1,79 @@
+# Sample configuration for a standalone Kafka Connect worker that uses Avro serialization and
+# integrates the the SchemaConfig Registry. This sample configuration assumes a local installation of
+# Confluent Platform with all services running on their default ports.
+# Bootstrap Kafka servers. If multiple servers are specified, they should be comma-separated.
+bootstrap.servers=pkc-l6wr6.europe-west2.gcp.confluent.cloud:9092
+# The converters specify the format of data in Kafka and how to translate it into Connect data.
+# Every Connect user will need to configure these based on the format they want their data in
+# when loaded from or stored into Kafka
+key.converter=org.apache.kafka.connect.storage.StringConverter
+#key.converter=io.confluent.connect.avro.AvroConverter
+#key.converter.schema.registry.url=https://<schema-registry-url>
+#key.converter.basic.auth.credentials.source=USER_INFO
+#key.converter.schema.registry.basic.auth.user.info=<api-key>:<secret>
+
+#value.converter=io.confluent.connect.avro.AvroConverter
+#value.converter=io.confluent.connect.protobuf.ProtobufConverter
+#value.converter=org.apache.kafka.connect.json.JsonConverter
+#value.converter.schemas.enable=false
+value.converter=io.confluent.connect.json.JsonSchemaConverter
+
+
+value.converter.schema.registry.url=https://<schema-registry-url>
+value.converter.basic.auth.credentials.source=USER_INFO
+value.converter.schema.registry.basic.auth.user.info=<api-key>:<secret>
+
+errors.log.enable=true
+errors.log.include.messages=true
+errors.tolerance=none
+
+
+# Enable Connect Reporter
+# https://docs.confluent.io/platform/current/connect/userguide.html#kconnect-reporter
+reporter.bootstrap.servers=<bootstrap-servers>
+reporter.result.topic.name=tecton-success-responses
+reporter.result.topic.replication.factor=1
+reporter.error.topic.name=tecton-error-responses
+reporter.error.topic.replication.factor=1
+
+reporter.admin.bootstrap.servers=<bootstrap-servers>
+reporter.admin.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule \
+required username="<username>" password="<password>";
+reporter.admin.security.protocol=SASL_SSL
+reporter.admin.sasl.mechanism=PLAIN
+
+reporter.producer.bootstrap.servers=<bootstrap-servers>
+reporter.producer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule \
+required username="<username>" password="<password>";
+reporter.producer.security.protocol=SASL_SSL
+reporter.producer.sasl.mechanism=PLAIN
+
+# The internal converter used for offsets and config data is configurable and must be specified,
+# but most users will always want to use the built-in default. Offset and config data is never
+# visible outside of Connect in this format.
+internal.key.converter=org.apache.kafka.connect.json.JsonConverter
+internal.value.converter=org.apache.kafka.connect.json.JsonConverter
+internal.key.converter.schemas.enable=false
+internal.value.converter.schemas.enable=false
+# Local storage file for offset data
+offset.storage.file.filename=/tmp/connect.offsets
+
+# Security settings
+ssl.endpoint.identification.algorithm=https
+sasl.mechanism=PLAIN
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+username="<username>" password="<password>";
+security.protocol=SASL_SSL
+
+consumer.ssl.endpoint.identification.algorithm=https
+consumer.sasl.mechanism=PLAIN
+consumer.sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required \
+username="<username>" password="<password>";
+consumer.security.protocol=SASL_SSL
+
+# TODO: Currently set to latest for testing purposes
+consumer.auto.offset.reset=latest
+auto.offset.reset=latest
+
+# Load our plugin from the output path.
+plugin.path=target/kafka-connect-target

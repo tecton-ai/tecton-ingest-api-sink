@@ -18,7 +18,7 @@ import com.tecton.ingestclient.processor.IRecordProcessor;
  * Implementation of a SinkTask that forwards records to Tecton via HTTP.
  */
 public class TectonHttpSinkTask extends SinkTask {
-  
+
   private static final Logger LOG = LoggerFactory.getLogger(TectonHttpSinkTask.class);
 
   /** Configuration for the Tecton HTTP Sink Connector. */
@@ -33,7 +33,8 @@ public class TectonHttpSinkTask extends SinkTask {
 
     config = new TectonHttpSinkConnectorConfig(settings);
     TectonHttpClient httpClient = new TectonHttpClient(config);
-    recordProcessor = new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
+    recordProcessor =
+        new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
 
     LOG.info("TectonHttpSinkTask initialised successfully");
   }
@@ -66,8 +67,8 @@ public class TectonHttpSinkTask extends SinkTask {
   }
 
   /**
-   * Initialises the errant record reporter to report problematic records and the
-   * corresponding problems.
+   * Initialises the errant record reporter to report problematic records and the corresponding
+   * problems.
    *
    * @return ErrantRecordReporter instance or null if not supported.
    */
