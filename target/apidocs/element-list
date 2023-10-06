@@ -1,0 +1,4 @@
+com.tecton.ingestclient.client
+com.tecton.ingestclient.converter
+com.tecton.ingestclient.processor
+com.tecton.kafka.connect

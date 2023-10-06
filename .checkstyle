@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fileset-config file-format-version="1.2.0" simple-config="false" sync-formatter="false">
+  <local-check-config name="maven-checkstyle-plugin validate" location="jar:file:/Users/jvarley/.m2/repository/com/github/jcustenborder/kafka/connect/kafka-connect-style-checkstyle/1.1.0.0.4/kafka-connect-style-checkstyle-1.1.0.0.4.jar!/checkstyle.xml" type="remote" description="maven-checkstyle-plugin configuration validate">
+    <property name="checkstyle.header.file" value="/Users/jvarley/Documents/projects-eclipse/.metadata/.plugins/org.eclipse.core.resources/.projects/tecton-ingest-api-sink/com.basistech.m2e.code.quality.checkstyleConfigurator/checkstyle-header-validate.txt"/>
+    <property name="checkstyle.cache.file" value="${project_loc}/target/checkstyle-cachefile"/>
+  </local-check-config>
+  <fileset name="java-sources-validate" enabled="true" check-config-name="maven-checkstyle-plugin validate" local="true">
+    <file-match-pattern match-pattern="^src/main/java/.*\/.*\.java" include-pattern="true"/>
+  </fileset>
+</fileset-config>

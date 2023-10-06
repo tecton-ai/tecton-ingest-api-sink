@@ -1,0 +1,4 @@
+com/tecton/ingest/api/sink/TectonHttpSinkTaskIT.class
+com/tecton/ingest/api/sink/TectonHttpSinkConnectorTest.class
+com/tecton/ingestclient/converter/TectonRecordTest.class
+com/tecton/ingest/api/sink/TectonHttpSinkTaskTest.class
