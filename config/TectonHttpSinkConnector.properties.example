@@ -19,8 +19,8 @@ tecton.dry.run.enabled=false
 tecton.batch.max.size=10
 
 # Kafka-related configurations
-tecton.kafka.timestamp.enabled=true
-tecton.kafka.key.enabled=true
+tecton.kafka.timestamp.enabled=false
+tecton.kafka.key.enabled=false
 # This will not be possible until Map type is supported by Tecton for Ingest API
 include.kafka.headers=false
 

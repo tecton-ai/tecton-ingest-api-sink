@@ -21,49 +21,49 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
   private static final int DEFAULT_BATCH_MAX_SIZE = 10;
 
   // HTTP-related configurations
-  private static final String HTTP_CLUSTER_ENDPOINT_CONFIG = "tecton.http.cluster.endpoint";
-  private static final String HTTP_AUTH_TOKEN_CONFIG = "tecton.http.auth.token";
-  private static final String HTTP_CONNECT_TIMEOUT_CONFIG = "tecton.http.connect.timeout";
-  private static final String HTTP_REQUEST_TIMEOUT_CONFIG = "tecton.http.request.timeout";
-  private static final String HTTP_ASYNC_ENABLED_CONFIG = "tecton.http.async.enabled";
-  private static final String HTTP_CONCURRENCY_LIMIT_CONFIG = "tecton.http.concurrency.limit";
+  protected static final String HTTP_CLUSTER_ENDPOINT_CONFIG = "tecton.http.cluster.endpoint";
+  protected static final String HTTP_AUTH_TOKEN_CONFIG = "tecton.http.auth.token";
+  protected static final String HTTP_CONNECT_TIMEOUT_CONFIG = "tecton.http.connect.timeout";
+  protected static final String HTTP_REQUEST_TIMEOUT_CONFIG = "tecton.http.request.timeout";
+  protected static final String HTTP_ASYNC_ENABLED_CONFIG = "tecton.http.async.enabled";
+  protected static final String HTTP_CONCURRENCY_LIMIT_CONFIG = "tecton.http.concurrency.limit";
 
   // Tecton payload related configurations
-  private static final String WORKSPACE_NAME_CONFIG = "tecton.workspace.name";
-  private static final String PUSH_SOURCE_NAME_CONFIG = "tecton.push.source.name";
-  private static final String DRY_RUN_ENABLED_CONFIG = "tecton.dry.run.enabled";
-  private static final String BATCH_MAX_SIZE_CONFIG = "tecton.batch.max.size";
+  protected static final String WORKSPACE_NAME_CONFIG = "tecton.workspace.name";
+  protected static final String PUSH_SOURCE_NAME_CONFIG = "tecton.push.source.name";
+  protected static final String DRY_RUN_ENABLED_CONFIG = "tecton.dry.run.enabled";
+  protected static final String BATCH_MAX_SIZE_CONFIG = "tecton.batch.max.size";
 
   // Kafka-related configurations
-  private static final String KAFKA_TIMESTAMP_ENABLED_CONFIG = "tecton.kafka.timestamp.enabled";
-  private static final String KAFKA_KEY_ENABLED_CONFIG = "tecton.kafka.key.enabled";
-  private static final String KAFKA_HEADERS_ENABLED_CONFIG = "tecton.kafka.headers.enabled";
+  protected static final String KAFKA_TIMESTAMP_ENABLED_CONFIG = "tecton.kafka.timestamp.enabled";
+  protected static final String KAFKA_KEY_ENABLED_CONFIG = "tecton.kafka.key.enabled";
+  protected static final String KAFKA_HEADERS_ENABLED_CONFIG = "tecton.kafka.headers.enabled";
 
   // Logging configuration
-  private static final String LOGGING_EVENT_DATA_ENABLED_CONFIG =
+  protected static final String LOGGING_EVENT_DATA_ENABLED_CONFIG =
       "tecton.logging.event.data.enabled";
 
   // HTTP-related Documentation
   static final String HTTP_CLUSTER_ENDPOINT_DOC =
       "The endpoint of your Tecton cluster, formatted as: https://<your_cluster>.tecton.ai.";
   static final String HTTP_AUTH_TOKEN_DOC =
-      "The authorisation token used to authenticate requests to the Stream Ingest API.";
+      "The authorisation token used to authenticate requests to the Tecton Ingest API.";
   static final String HTTP_CONNECT_TIMEOUT_DOC =
-      "The HTTP connect timeout for the Tecton API, in seconds.";
+      "The HTTP connect timeout for the Tecton Ingest API in seconds.";
   static final String HTTP_REQUEST_TIMEOUT_DOC =
-      "The timeout for the HTTP request to Tecton's Ingest API, in seconds.";
+      "The HTTP request timeout for the Tecton Ingest API in seconds.";
   static final String HTTP_ASYNC_ENABLED_DOC =
-      "Enables HTTP asynchronous sending for concurrent invocations. The default is true.";
+      "Enables HTTP asynchronous sending to allow concurrent requests to Tecton Ingest API. Event order cannot be guaranteed.";
   static final String HTTP_CONCURRENCY_LIMIT_DOC =
-      "Limits the number of concurrent HTTP requests when async is enabled. The default is 50.";
+      "Limits the number of concurrent HTTP requests to the Tecton Ingest API when asynchronous sending is enabled.";
 
   // Tecton Payload-related Documentation
-  static final String WORKSPACE_NAME_DOC = "The name of the workspace in Tecton.";
-  static final String PUSH_SOURCE_NAME_DOC = "The name of the Tecton Push Source.";
+  static final String WORKSPACE_NAME_DOC = "The name of the workspace where the Push Sources(s) are defined";
+  static final String PUSH_SOURCE_NAME_DOC = "The name of the Tecton Push Source to write the record(s) to.";
   static final String DRY_RUN_ENABLED_DOC =
-      "If set to true, the connector will not actually send data.";
+      "When set to True, the request will be validated but no events will be written to the Online Store.";
   static final String BATCH_MAX_SIZE_DOC =
-      "The maximum size of the batch of events sent to Tecton. The default is 10.";
+      "The maximum size of the batch of events sent to Tecton. There is currently no limit for Ingest API, but Tecton recommends 10.";
 
   // Kafka-related Documentation
   static final String KAFKA_TIMESTAMP_ENABLED_DOC =
@@ -75,7 +75,7 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
 
   // Logging Documentation
   static final String LOGGING_EVENT_DATA_ENABLED_DOC =
-      "Determines whether the event data should be logged for debugging purposes. The default is false.";
+      "Determines whether the event data should be logged for debugging purposes. Enabling could risk sensitive data appearing in logs.";
 
   // Configuration parameters
   public final String httpAuthToken;
@@ -166,7 +166,7 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
         .define(ConfigKeyBuilder.of(DRY_RUN_ENABLED_CONFIG, BOOLEAN)
             .documentation(DRY_RUN_ENABLED_DOC)
             .importance(MEDIUM)
-            .defaultValue(false)
+            .defaultValue(true)
             .build())
         .define(ConfigKeyBuilder.of(BATCH_MAX_SIZE_CONFIG, INT)
             .documentation(BATCH_MAX_SIZE_DOC)
@@ -177,24 +177,24 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
         // Kafka-related configuration
         .define(ConfigKeyBuilder.of(KAFKA_TIMESTAMP_ENABLED_CONFIG, BOOLEAN)
             .documentation(KAFKA_TIMESTAMP_ENABLED_DOC)
-            .importance(MEDIUM)
+            .importance(LOW)
             .defaultValue(false)
             .build())
         .define(ConfigKeyBuilder.of(KAFKA_KEY_ENABLED_CONFIG, BOOLEAN)
             .documentation(KAFKA_KEY_ENABLED_DOC)
-            .importance(MEDIUM)
+            .importance(LOW)
             .defaultValue(false)
             .build())
         .define(ConfigKeyBuilder.of(KAFKA_HEADERS_ENABLED_CONFIG, BOOLEAN)
             .documentation(KAFKA_HEADERS_ENABLED_DOC)
-            .importance(MEDIUM)
+            .importance(LOW)
             .defaultValue(false)
             .build())
 
         // Logging-related configurations
         .define(ConfigKeyBuilder.of(LOGGING_EVENT_DATA_ENABLED_CONFIG, BOOLEAN)
             .documentation(LOGGING_EVENT_DATA_ENABLED_DOC)
-            .importance(MEDIUM)
+            .importance(LOW)
             .defaultValue(false)
             .build());
   }
