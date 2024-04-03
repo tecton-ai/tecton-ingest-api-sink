@@ -17,7 +17,6 @@
 package com.tecton.kafka.connect;
 
 import com.github.jcustenborder.kafka.connect.utils.config.Introduction;
-
 import com.github.jcustenborder.kafka.connect.utils.config.PluginName;
 import com.github.jcustenborder.kafka.connect.utils.config.PluginOwner;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;

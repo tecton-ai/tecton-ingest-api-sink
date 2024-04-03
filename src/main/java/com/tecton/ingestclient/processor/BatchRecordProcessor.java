@@ -1,5 +1,19 @@
 package com.tecton.ingestclient.processor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import org.apache.kafka.connect.errors.ConnectException;
+import org.apache.kafka.connect.errors.DataException;
+import org.apache.kafka.connect.sink.ErrantRecordReporter;
+import org.apache.kafka.connect.sink.SinkRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.tecton.ingestclient.client.TectonApiRequest;
 import com.tecton.ingestclient.client.TectonApiResponse;
 import com.tecton.ingestclient.client.TectonHttpClient;
@@ -7,17 +21,6 @@ import com.tecton.ingestclient.converter.IRecordConverter;
 import com.tecton.ingestclient.converter.TectonRecord;
 import com.tecton.ingestclient.converter.TectonRecordConverter;
 import com.tecton.kafka.connect.TectonHttpSinkConnectorConfig;
-import org.apache.kafka.connect.errors.ConnectException;
-import org.apache.kafka.connect.errors.DataException;
-import org.apache.kafka.connect.sink.ErrantRecordReporter;
-import org.apache.kafka.connect.sink.SinkRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Processor to handle SinkRecord collections in batches.

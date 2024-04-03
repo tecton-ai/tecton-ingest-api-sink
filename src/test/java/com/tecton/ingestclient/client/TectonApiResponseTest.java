@@ -25,7 +25,7 @@ class TectonApiResponseTest {
         // Setting default values
         response.setWorkspaceName("testWorkspace");
         response.setIngestMetrics(ingestMetrics);
-        
+
         featureViewMetric.setFeatureViewName("featureTest");
         featureViewMetric.setOnlineRecordIngestCount("10");
         featureViewMetric.setOfflineRecordIngestCount("20");

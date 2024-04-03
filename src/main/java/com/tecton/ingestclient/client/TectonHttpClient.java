@@ -14,20 +14,18 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
-
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.errors.RetriableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tecton.kafka.connect.TectonHttpSinkConnectorConfig;
 
 /**
  * A client for sending HTTP requests to the Tecton API.
- * 
+ *
  * <p>
  * Provides mechanisms to construct and send requests to the Tecton API, process the responses, and
  * parse them into appropriate models.
@@ -53,7 +51,7 @@ public class TectonHttpClient {
 
   /**
    * Initialises a new instance of {@code TectonHttpClient}.
-   * 
+   *
    * @param config The configuration object containing details such as the base endpoint of the
    *        Tecton API, the API key for authentication, connection timeout, and request timeout.
    */
@@ -68,7 +66,7 @@ public class TectonHttpClient {
 
   /**
    * Sends a synchronous request to the Tecton API.
-   * 
+   *
    * @param requestData The data to be sent to the Tecton API.
    * @return The response from the Tecton API.
    * @throws ConnectException If there's a non-retriable error from the Tecton API.
@@ -102,7 +100,7 @@ public class TectonHttpClient {
 
   /**
    * Sends an asynchronous request to the Tecton API.
-   * 
+   *
    * @param requestData The data to be sent to the Tecton API.
    * @return A future representing the response from the Tecton API.
    */
@@ -130,7 +128,7 @@ public class TectonHttpClient {
 
     return client.sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenApply(response -> {
       long endTime = System.currentTimeMillis();
-      LOG.debug("Received asynchronous response from Tecton API in {} ms", endTime - startTime);
+      LOG.info("Received asynchronous response from Tecton API in {} ms", endTime - startTime);
       concurrencySemaphore.release();
       return processResponse(response);
     }).exceptionally(e -> {
@@ -141,7 +139,7 @@ public class TectonHttpClient {
 
   /**
    * Sends a batch of asynchronous requests to the Tecton API.
-   * 
+   *
    * @param batchRequestData A list of data to be sent to the Tecton API.
    * @return A list of futures representing the responses from the Tecton API for each request.
    */

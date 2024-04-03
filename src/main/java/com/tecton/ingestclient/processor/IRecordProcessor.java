@@ -1,8 +1,7 @@
 package com.tecton.ingestclient.processor;
 
-import org.apache.kafka.connect.sink.SinkRecord;
-
 import java.util.Collection;
+import org.apache.kafka.connect.sink.SinkRecord;
 
 /**
  * Defines the contract for record processors which handle the processing of SinkRecord collections.

@@ -1,14 +1,17 @@
 package com.tecton.kafka.connect;
 
-import static org.apache.kafka.common.config.ConfigDef.Importance.*;
-import static org.apache.kafka.common.config.ConfigDef.Type.*;
-
+import static org.apache.kafka.common.config.ConfigDef.Importance.HIGH;
+import static org.apache.kafka.common.config.ConfigDef.Importance.LOW;
+import static org.apache.kafka.common.config.ConfigDef.Importance.MEDIUM;
+import static org.apache.kafka.common.config.ConfigDef.Type.BOOLEAN;
+import static org.apache.kafka.common.config.ConfigDef.Type.INT;
+import static org.apache.kafka.common.config.ConfigDef.Type.PASSWORD;
+import static org.apache.kafka.common.config.ConfigDef.Type.STRING;
+import java.time.Duration;
+import java.util.Map;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
 import com.github.jcustenborder.kafka.connect.utils.config.ConfigKeyBuilder;
-
-import java.time.Duration;
-import java.util.Map;
 
 /**
  * Configuration class for TectonHttpSinkConnector. Holds the configuration parameters required to

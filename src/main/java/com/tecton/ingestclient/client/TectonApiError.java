@@ -1,10 +1,9 @@
 package com.tecton.ingestclient.client;
 
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.List;
 
 /**
  * Represents an error response from the Tecton API. Used for deserialising JSON error responses
@@ -32,7 +31,7 @@ public class TectonApiError {
 
   /**
    * Retrieves the request error details.
-   * 
+   *
    * @return the request error details.
    */
   public RequestError getRequestError() {
@@ -50,7 +49,7 @@ public class TectonApiError {
 
   /**
    * Retrieves the workspace name.
-   * 
+   *
    * @return the workspace name.
    */
   public String getWorkspaceName() {
@@ -68,7 +67,7 @@ public class TectonApiError {
 
   /**
    * Retrieves the list of record errors.
-   * 
+   *
    * @return the list of record errors.
    */
   public List<RecordError> getRecordErrors() {
@@ -146,7 +145,7 @@ public class TectonApiError {
 
     /**
      * Retrieves the error type.
-     * 
+     *
      * @return the error type.
      */
     public String getErrorType() {
@@ -199,7 +198,7 @@ public class TectonApiError {
 
     /**
      * Retrieves the feature view name.
-     * 
+     *
      * @return the feature view name.
      */
     public String getFeatureViewName() {
@@ -217,7 +216,7 @@ public class TectonApiError {
 
     /**
      * Retrieves the push source name.
-     * 
+     *
      * @return the push source name.
      */
     public String getPushSourceName() {
@@ -235,7 +234,7 @@ public class TectonApiError {
 
     /**
      * Retrieves the error type.
-     * 
+     *
      * @return the error type.
      */
     public String getErrorType() {
@@ -253,7 +252,7 @@ public class TectonApiError {
 
     /**
      * Retrieves the error message.
-     * 
+     *
      * @return the error message.
      */
     public String getErrorMessage() {

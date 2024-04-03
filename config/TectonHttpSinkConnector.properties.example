@@ -22,7 +22,7 @@ tecton.batch.max.size=10
 tecton.kafka.timestamp.enabled=false
 tecton.kafka.key.enabled=false
 # This will not be possible until Map type is supported by Tecton for Ingest API
-include.kafka.headers=false
+tecton.kafka.headers.enabled=false
 
 # Logging configuration
 tecton.logging.event.data.enabled=false

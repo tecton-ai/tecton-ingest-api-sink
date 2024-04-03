@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +17,7 @@ public class TectonHttpSinkConnectorTest {
     public void setup() {
         connector = new TectonHttpSinkConnector();
         settings = new HashMap<>();
-        
+
         // Mock settings - You can add more to this list to cover all settings if desired.
         settings.put(TectonHttpSinkConnectorConfig.HTTP_CLUSTER_ENDPOINT_CONFIG, "https://test.tecton.ai");
         settings.put(TectonHttpSinkConnectorConfig.HTTP_AUTH_TOKEN_CONFIG, "sample-auth-token");
@@ -34,8 +35,10 @@ public class TectonHttpSinkConnectorTest {
 
     @Test
     public void testConfig() {
-        assertNotNull(connector.config());
-        assertEquals(TectonHttpSinkConnectorConfig.config(), connector.config());
+      assertNotNull(connector.config());
+      Set<String> expectedConfigKeys = TectonHttpSinkConnectorConfig.config().configKeys().keySet();
+      Set<String> actualConfigKeys = connector.config().configKeys().keySet();
+      assertEquals(expectedConfigKeys, actualConfigKeys);
     }
 
     @Test

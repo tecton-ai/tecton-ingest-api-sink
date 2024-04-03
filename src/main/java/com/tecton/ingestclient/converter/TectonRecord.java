@@ -54,9 +54,7 @@ public class TectonRecord {
    * @return True if the object is a valid Tecton type; false otherwise.
    */
   private static boolean isValidTectonValue(final Object value) {
-    if (value == null)
-      return true;
-    if (value instanceof String || value instanceof Number || value instanceof Boolean) {
+    if ((value == null) || value instanceof String || value instanceof Number || value instanceof Boolean) {
       return true;
     }
     if (value instanceof List) {

@@ -1,17 +1,5 @@
 package com.tecton.ingestclient.converter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tecton.kafka.connect.TectonHttpSinkConnectorConfig;
-import org.apache.kafka.connect.data.Schema;
-import org.apache.kafka.connect.data.Struct;
-import org.apache.kafka.connect.errors.DataException;
-import org.apache.kafka.connect.json.JsonConverter;
-import org.apache.kafka.connect.sink.SinkRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -19,6 +7,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.kafka.connect.data.Schema;
+import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.errors.DataException;
+import org.apache.kafka.connect.json.JsonConverter;
+import org.apache.kafka.connect.sink.SinkRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tecton.kafka.connect.TectonHttpSinkConnectorConfig;
 
 /**
  * Converts SinkRecords into TectonRecords with optional extraction of metadata.
@@ -103,7 +102,10 @@ public class TectonRecordConverter implements IRecordConverter {
       recordData.put("kafka_timestamp", formatTimestamp(record.timestamp()));
     }
     if (config.kafkaHeadersEnabled) {
-      recordData.putAll(extractHeaders(record));
+      Map<String, String> headers = extractHeaders(record);
+      if (!headers.isEmpty()) {
+          recordData.put("kafka_headers", headers);
+      }
     }
   }
 

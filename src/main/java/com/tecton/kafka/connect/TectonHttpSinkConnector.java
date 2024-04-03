@@ -1,21 +1,19 @@
 package com.tecton.kafka.connect;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import org.apache.kafka.common.config.ConfigDef;
 import org.apache.kafka.connect.connector.Task;
 import org.apache.kafka.connect.sink.SinkConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
 import com.github.jcustenborder.kafka.connect.utils.config.Description;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationImportant;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationNote;
 import com.github.jcustenborder.kafka.connect.utils.config.DocumentationTip;
 import com.github.jcustenborder.kafka.connect.utils.config.Title;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * An HTTP Sink Connector for Kafka, which sends records to Tecton's Ingest API.

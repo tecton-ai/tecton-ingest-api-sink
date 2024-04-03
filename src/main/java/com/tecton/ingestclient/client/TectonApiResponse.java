@@ -23,7 +23,7 @@ public class TectonApiResponse {
 
   /**
    * Retrieves the workspace name.
-   * 
+   *
    * @return the workspace name.
    */
   public String getWorkspaceName() {
@@ -32,7 +32,7 @@ public class TectonApiResponse {
 
   /**
    * Sets the workspace name.
-   * 
+   *
    * @param workspaceName the name of the workspace to set.
    */
   public void setWorkspaceName(String workspaceName) {
@@ -41,7 +41,7 @@ public class TectonApiResponse {
 
   /**
    * Retrieves the ingestion metrics.
-   * 
+   *
    * @return the ingestion metrics.
    */
   public IngestMetrics getIngestMetrics() {
@@ -50,7 +50,7 @@ public class TectonApiResponse {
 
   /**
    * Sets the ingestion metrics.
-   * 
+   *
    * @param ingestMetrics the metrics related to ingestion to set.
    */
   public void setIngestMetrics(IngestMetrics ingestMetrics) {
@@ -92,7 +92,7 @@ public class TectonApiResponse {
 
     /**
      * Retrieves the feature view ingestion metrics.
-     * 
+     *
      * @return the feature view ingestion metrics.
      */
     public List<FeatureViewMetric> getFeatureViewIngestMetrics() {
@@ -101,7 +101,7 @@ public class TectonApiResponse {
 
     /**
      * Sets the feature view ingestion metrics.
-     * 
+     *
      * @param featureViewIngestMetrics the metrics related to feature view ingestion to set.
      */
     public void setFeatureViewIngestMetrics(List<FeatureViewMetric> featureViewIngestMetrics) {
@@ -134,7 +134,7 @@ public class TectonApiResponse {
 
       /**
        * Retrieves the feature view name.
-       * 
+       *
        * @return the feature view name.
        */
       public String getFeatureViewName() {
@@ -143,7 +143,7 @@ public class TectonApiResponse {
 
       /**
        * Sets the feature view name.
-       * 
+       *
        * @param featureViewName the name of the feature view to set.
        */
       public void setFeatureViewName(String featureViewName) {
@@ -152,7 +152,7 @@ public class TectonApiResponse {
 
       /**
        * Retrieves the count of records ingested online.
-       * 
+       *
        * @return the count of online ingested records.
        */
       public String getOnlineRecordIngestCount() {
@@ -161,7 +161,7 @@ public class TectonApiResponse {
 
       /**
        * Sets the count of records ingested online.
-       * 
+       *
        * @param onlineRecordIngestCount the count of online ingested records to set.
        */
       public void setOnlineRecordIngestCount(String onlineRecordIngestCount) {
@@ -170,7 +170,7 @@ public class TectonApiResponse {
 
       /**
        * Retrieves the count of records ingested offline.
-       * 
+       *
        * @return the count of offline ingested records.
        */
       public String getOfflineRecordIngestCount() {
@@ -179,7 +179,7 @@ public class TectonApiResponse {
 
       /**
        * Sets the count of records ingested offline.
-       * 
+       *
        * @param offlineRecordIngestCount the count of offline ingested records to set.
        */
       public void setOfflineRecordIngestCount(String offlineRecordIngestCount) {
