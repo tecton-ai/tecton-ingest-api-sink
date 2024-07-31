@@ -28,7 +28,7 @@ This Sink Connector will transform data from a Kafka topic into a batch of json 
 ```
 # Connector class configuration
 name=tecton-ingest-api-sink
-topics=my_topic1, my_topic2
+topics=<source-topics>
 tasks.max=1
 connector.class=com.tecton.kafka.connect.TectonHttpSinkConnector
 
@@ -38,22 +38,21 @@ tecton.http.auth.token=<auth-token>
 tecton.http.connect.timeout=30
 tecton.http.request.timeout=30
 tecton.http.async.enabled=true
-tecton.http.concurrency.limit=50
+tecton.http.concurrency.limit=5
 
 # Tecton payload related configurations
 tecton.workspace.name=<workspace-name>
 tecton.push.source.name=<push-source-name>
-# Set to false when you are ready to write data to Tecton's Online Store
 tecton.dry.run.enabled=false
 tecton.batch.max.size=10
 
 # Kafka-related configurations
 tecton.kafka.timestamp.enabled=false
 tecton.kafka.key.enabled=false
-include.kafka.headers=false
+tecton.kafka.headers.enabled=false
 tecton.kafka.sanitise.keys.enabled=false
 
-# Logging configuration
+# Logging configuration - warning will print event payload data to logs
 tecton.logging.event.data.enabled=false
 
 # Optional: Configure errant record reporter
