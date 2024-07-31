@@ -20,55 +20,10 @@ import com.tecton.ingestclient.util.JsonUtil;
 import com.tecton.kafka.connect.TectonHttpSinkConnectorConfig;
 
 /**
- * Interface for Tecton HTTP Client.
- */
-public interface TectonHttpClient {
-
-  /**
-   * Sends a synchronous request to the Tecton Ingest API.
-   *
-   * @param requestData The request data to be sent.
-   * @return The API response.
-   * @throws ConnectException If a non-retriable error occurs.
-   * @throws RetriableException If a retriable error occurs.
-   */
-  TectonApiResponse sendSync(TectonApiRequest requestData)
-      throws ConnectException, RetriableException;
-
-  /**
-   * Sends an asynchronous request to the Tecton Ingest API.
-   *
-   * @param requestData The request data to be sent.
-   * @return A CompletableFuture representing the API response.
-   */
-  CompletableFuture<TectonApiResponse> sendAsync(TectonApiRequest requestData);
-
-  /**
-   * Sends a batch of asynchronous requests to the Tecton Ingest API.
-   *
-   * @param batchRequestData The list of request data to be sent.
-   * @return A list of CompletableFutures representing the API responses.
-   */
-  List<CompletableFuture<TectonApiResponse>> sendAsyncBatch(
-      List<TectonApiRequest> batchRequestData);
-
-  /**
-   * Factory method to create an instance of TectonHttpClient.
-   *
-   * @param config The configuration for the Tecton HTTP Sink Connector.
-   * @return An instance of TectonHttpClient.
-   */
-  static TectonHttpClient create(TectonHttpSinkConnectorConfig config) {
-    return new TectonHttpClientImpl(config);
-  }
-}
-
-
-/**
  * Implementation of TectonHttpClient.
  */
-class TectonHttpClientImpl implements TectonHttpClient {
-  private static final Logger LOG = LoggerFactory.getLogger(TectonHttpClientImpl.class);
+class TectonHttpClient implements ITectonHttpClient {
+  private static final Logger LOG = LoggerFactory.getLogger(TectonHttpClient.class);
   private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String CONTENT_TYPE_HEADER = "Content-Type";
   private static final String ACCEPT_HEADER = "Accept";
@@ -89,7 +44,7 @@ class TectonHttpClientImpl implements TectonHttpClient {
    * @param config The configuration object containing details such as the base endpoint of the
    *        Tecton API, the API key for authentication, connection timeout, and request timeout.
    */
-  public TectonHttpClientImpl(TectonHttpSinkConnectorConfig config) {
+  public TectonHttpClient(TectonHttpSinkConnectorConfig config) {
     this.tectonApiBaseEndpoint = URI.create(config.httpClusterEndpoint);
     LOG.debug("Initializing TectonHttpClient with endpoint: {}", tectonApiBaseEndpoint);
     this.config = config;

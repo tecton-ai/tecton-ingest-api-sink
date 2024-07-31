@@ -8,4 +8,4 @@ mvn clean package
 export KAFKA_JMX_OPTS="-Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=${SUSPEND},address=5005"
 
 
-connect-standalone config/connect-cloud-avro-docker.properties config/TectonHttpSinkConnector.properties
+connect-standalone config/connect-standalone.properties config/tecton-sink.properties

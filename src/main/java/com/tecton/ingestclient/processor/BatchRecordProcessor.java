@@ -15,9 +15,9 @@ import org.apache.kafka.connect.sink.ErrantRecordReporter;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.tecton.ingestclient.client.ITectonHttpClient;
 import com.tecton.ingestclient.client.TectonApiRequest;
 import com.tecton.ingestclient.client.TectonApiResponse;
-import com.tecton.ingestclient.client.TectonHttpClient;
 import com.tecton.ingestclient.converter.IRecordConverter;
 import com.tecton.ingestclient.converter.TectonRecord;
 import com.tecton.ingestclient.converter.TectonRecordConverter;
@@ -32,7 +32,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
 
   private final TectonHttpSinkConnectorConfig config;
   private final IRecordConverter tectonConverter;
-  private final TectonHttpClient httpClient;
+  private final ITectonHttpClient httpClient;
   private final Optional<ErrantRecordReporter> reporter;
 
   /**
@@ -42,7 +42,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * @param reporter The errant record reporter.
    * @param config Configuration for the processor.
    */
-  public BatchRecordProcessor(final TectonHttpClient httpClient,
+  public BatchRecordProcessor(final ITectonHttpClient httpClient,
       final ErrantRecordReporter reporter, final TectonHttpSinkConnectorConfig config) {
     this.config = config;
     this.httpClient = httpClient;
@@ -54,17 +54,20 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * Processes a collection of SinkRecords, transforms them to Tecton API requests, and sends them.
    *
    * @param records Collection of SinkRecords to be processed.
+   * @return The number of successfully processed records.
    * @throws ConnectException if a non-retriable error occurs.
    * @throws RetriableException if a retriable error occurs.
    */
   @Override
-  public void processRecords(final Collection<SinkRecord> records)
+  public int processRecords(final Collection<SinkRecord> records)
       throws ConnectException, RetriableException {
     final List<SinkRecord> validRecords = new ArrayList<>();
+    int successCount = 0;
 
     for (SinkRecord record : records) {
       try {
         processSingleRecord(record, validRecords);
+        successCount++;
       } catch (Exception e) {
         reportErrantRecord(record, e);
       }
@@ -74,6 +77,8 @@ public class BatchRecordProcessor implements IRecordProcessor {
         .map(this::prepareBatchRequest).collect(Collectors.toList());
 
     processBatchRequests(batchRequests);
+
+    return successCount;
   }
 
   /**

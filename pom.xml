@@ -112,7 +112,7 @@
                 <artifactId>kafka-connect-maven-plugin</artifactId>
                 <configuration>
                     <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
-					<documentationUrl>https://jcustenborder.github.io/kafka-connect-documentation/</documentationUrl>
+			<documentationUrl>https://jcustenborder.github.io/kafka-connect-documentation/</documentationUrl>
                     <componentTypes>
                         <componentType>sink</componentType>
                     </componentTypes>

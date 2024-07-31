@@ -11,7 +11,7 @@ import org.apache.kafka.connect.sink.SinkTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.github.jcustenborder.kafka.connect.utils.VersionUtil;
-import com.tecton.ingestclient.client.TectonHttpClient;
+import com.tecton.ingestclient.client.ITectonHttpClient;
 import com.tecton.ingestclient.processor.BatchRecordProcessor;
 import com.tecton.ingestclient.processor.IRecordProcessor;
 
@@ -33,7 +33,7 @@ public class TectonHttpSinkTask extends SinkTask {
     LOG.info("Starting TectonHttpSinkTask");
 
     config = new TectonHttpSinkConnectorConfig(settings);
-    TectonHttpClient httpClient = TectonHttpClient.create(config);
+    ITectonHttpClient httpClient = ITectonHttpClient.create(config);
     recordProcessor =
         new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
 
@@ -49,7 +49,8 @@ public class TectonHttpSinkTask extends SinkTask {
 
     LOG.info("Processing {} records", records.size());
     try {
-      recordProcessor.processRecords(records);
+      int successfulRecords = recordProcessor.processRecords(records);
+      LOG.info("Successfully processed {} out of {} records", successfulRecords, records.size());
     } catch (ConnectException e) {
       LOG.error("Error processing records", e);
       throw e;

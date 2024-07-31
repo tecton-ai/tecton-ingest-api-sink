@@ -12,8 +12,9 @@ public interface IRecordProcessor {
    * Processes a collection of SinkRecords.
    *
    * @param records A collection of SinkRecords to be processed.
+   * @return The number of successfully processed records.
    */
-  void processRecords(Collection<SinkRecord> records);
+  int processRecords(Collection<SinkRecord> records);
 
   /**
    * Performs any necessary cleanup actions before the processor is closed or disposed of.
