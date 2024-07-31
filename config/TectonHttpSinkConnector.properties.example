@@ -10,7 +10,7 @@ tecton.http.auth.token=<auth-token>
 tecton.http.connect.timeout=30
 tecton.http.request.timeout=30
 tecton.http.async.enabled=true
-tecton.http.concurrency.limit=50
+tecton.http.concurrency.limit=5
 
 # Tecton payload related configurations
 tecton.workspace.name=<workspace-name>
@@ -21,8 +21,17 @@ tecton.batch.max.size=10
 # Kafka-related configurations
 tecton.kafka.timestamp.enabled=false
 tecton.kafka.key.enabled=false
-# This will not be possible until Map type is supported by Tecton for Ingest API
 tecton.kafka.headers.enabled=false
+tecton.kafka.sanitise.keys.enabled=false
 
-# Logging configuration
+# Logging configuration - warning will print event payload data to logs
 tecton.logging.event.data.enabled=false
+
+# Optional: Configure errant record reporter
+errors.log.enable=true
+errors.tolerance=all
+errors.log.include.messages=true
+errors.retry.delay.max.ms=60000
+errors.deadletterqueue.topic.name=<dlq-topic>
+errors.deadletterqueue.topic.replication.factor=1
+errors.deadletterqueue.context.headers.enable=true

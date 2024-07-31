@@ -88,7 +88,7 @@ class TectonApiRequestTest {
         new TectonApiRequest.RecordWrapper("pushSource", record);
 
     assertEquals("pushSource", wrapper.getPushSource());
-    assertEquals(record, wrapper.getRecordData());
+    assertEquals(record, wrapper.getRecord());
   }
 
   @Test

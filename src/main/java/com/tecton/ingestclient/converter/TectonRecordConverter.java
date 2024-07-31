@@ -43,14 +43,26 @@ public class TectonRecordConverter implements IRecordConverter {
     LOG.debug("TectonRecordConverter initialised with configuration: {}", config);
   }
 
+  /**
+   * Converts a {@code SinkRecord} from Kafka into a {@code TectonRecord}.
+   *
+   * @param record The Kafka sink record to be converted.
+   * @return A {@code TectonRecord} representing the converted data ready for ingestion to Tecton.
+   */
   @Override
   public TectonRecord convert(SinkRecord record) {
     LOG.debug("Converting SinkRecord from topic {}", record.topic());
     Map<String, Object> recordData = extractRecordData(record);
+    if (config.kafkaSanitiseKeysEnabled) {
+      recordData = sanitiseKeys(recordData);
+    }
     extractAndAddMetadata(record, recordData);
     return new TectonRecord(recordData);
   }
 
+  /**
+   * Closes the converter, releasing any resources that were acquired.
+   */
   @Override
   public void close() {
     jsonConverter.close();
@@ -86,8 +98,40 @@ public class TectonRecordConverter implements IRecordConverter {
   }
 
   /**
+   * Sanitises the keys in a map by replacing all non-alphanumeric characters with underscores and
+   * ensuring keys do not start with digits, which are prefixed with an underscore to ensure
+   * compatibility with JSON key naming conventions required by Tecton.
+   *
+   * @param original The original map containing keys that may need sanitisation.
+   * @return A new map with sanitised keys.
+   */
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> sanitiseKeys(Map<String, Object> original) {
+    if (original == null) {
+      LOG.debug("No data to sanitize, received a null map.");
+      return Collections.emptyMap();
+    }
+
+    Map<String, Object> sanitised = new HashMap<>();
+    original.forEach((key, value) -> {
+      String cleanKey = key.replaceAll("[^a-zA-Z0-9_]", "_").replaceAll("^\\d+", "_$0");
+      if (!key.equals(cleanKey)) {
+        LOG.debug("Sanitized key '{}' to '{}'.", key, cleanKey);
+      }
+
+      if (value instanceof Map) {
+        value = sanitiseKeys((Map<String, Object>) value);
+      }
+
+      sanitised.put(cleanKey, value);
+    });
+
+    return sanitised;
+  }
+
+  /**
    * Extracts and adds metadata (key, timestamp, headers) to the record data if enabled in the
-   * configuration.
+   * configuration. Sets the keys to null if the metadata is not present.
    *
    * @param record The SinkRecord from which to extract metadata.
    * @param recordData The map to which the extracted metadata will be added.
@@ -95,17 +139,15 @@ public class TectonRecordConverter implements IRecordConverter {
   private void extractAndAddMetadata(SinkRecord record, Map<String, Object> recordData) {
     LOG.debug("Extracting metadata for record from topic {}", record.topic());
 
-    if (config.kafkaKeyEnabled && record.key() != null) {
-      recordData.put("kafka_key", extractKeyData(record));
+    if (config.kafkaKeyEnabled) {
+      recordData.put("kafka_key", record.key() != null ? extractKeyData(record) : null);
     }
-    if (config.kafkaTimestampEnabled && record.timestamp() != null) {
-      recordData.put("kafka_timestamp", formatTimestamp(record.timestamp()));
+    if (config.kafkaTimestampEnabled) {
+      recordData.put("kafka_timestamp", record.timestamp() != null ? formatTimestamp(record.timestamp()) : null);
     }
     if (config.kafkaHeadersEnabled) {
       Map<String, String> headers = extractHeaders(record);
-      if (!headers.isEmpty()) {
-          recordData.put("kafka_headers", headers);
-      }
+      recordData.put("kafka_headers", !headers.isEmpty() ? headers : null);
     }
   }
 

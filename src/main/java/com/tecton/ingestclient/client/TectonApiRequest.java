@@ -7,9 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tecton.ingestclient.converter.TectonRecord;
+import com.tecton.ingestclient.util.JsonUtil;
 
 /**
  * Represents the request payload for the Tecton API.
@@ -25,38 +24,42 @@ public class TectonApiRequest {
   @JsonProperty("records")
   private final Map<String, List<TectonRecord>> records;
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
   /**
-   * Private constructor to create a new API request.
+   * Constructor to create a new API request.
    *
    * @param workspaceName the workspace name. Must not be null.
    * @param dryRun indicates if it's a dry run.
    * @param records the records associated with the request. Must not be null.
    */
-  private TectonApiRequest(String workspaceName, boolean dryRun,
+  public TectonApiRequest(String workspaceName, boolean dryRun,
       Map<String, List<TectonRecord>> records) {
     this.workspaceName = Objects.requireNonNull(workspaceName, "Workspace name cannot be null.");
     this.dryRun = dryRun;
-    this.records = Collections.unmodifiableMap(records);
+    this.records = Collections.unmodifiableMap(new HashMap<>(records));
   }
 
   /**
-   * @return the workspace name associated with the request.
+   * Gets the workspace name associated with the request.
+   *
+   * @return the workspace name.
    */
   public String getWorkspaceName() {
     return workspaceName;
   }
 
   /**
-   * @return whether the request is a dry run.
+   * Returns whether the request is a dry run.
+   *
+   * @return true if the request is a dry run, otherwise false.
    */
   public boolean isDryRun() {
     return dryRun;
   }
 
   /**
-   * @return the map of records associated with the request.
+   * Gets the map of records associated with the request.
+   *
+   * @return the map of records.
    */
   public Map<String, List<TectonRecord>> getRecords() {
     return records;
@@ -73,15 +76,7 @@ public class TectonApiRequest {
 
   @Override
   public String toString() {
-    return toJson(this);
-  }
-
-  private static String toJson(Object obj) {
-    try {
-      return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
-    } catch (JsonProcessingException e) {
-      return "Error converting to JSON: " + e.getMessage();
-    }
+    return JsonUtil.toJson(this);
   }
 
   /**
@@ -103,7 +98,7 @@ public class TectonApiRequest {
     }
 
     /**
-     * Returns the push source.
+     * Gets the push source.
      *
      * @return the push source.
      */
@@ -112,17 +107,17 @@ public class TectonApiRequest {
     }
 
     /**
-     * Returns the record data.
+     * Gets the record data.
      *
-     * @return a map containing the record data.
+     * @return the record data.
      */
-    public TectonRecord getRecordData() {
+    public TectonRecord getRecord() {
       return record;
     }
 
     @Override
     public String toString() {
-      return toJson(this);
+      return JsonUtil.toJson(this);
     }
   }
 
@@ -141,10 +136,7 @@ public class TectonApiRequest {
      * @return this builder.
      */
     public Builder workspaceName(String workspaceName) {
-      if (workspaceName == null) {
-        throw new NullPointerException("Workspace name cannot be null.");
-      }
-      this.workspaceName = workspaceName;
+      this.workspaceName = Objects.requireNonNull(workspaceName, "Workspace name cannot be null.");
       return this;
     }
 
@@ -166,8 +158,9 @@ public class TectonApiRequest {
      * @return this builder.
      */
     public Builder addRecord(RecordWrapper recordWrapper) {
+      Objects.requireNonNull(recordWrapper, "Record wrapper cannot be null.");
       records.computeIfAbsent(recordWrapper.getPushSource(), k -> new ArrayList<>())
-          .add(recordWrapper.getRecordData());
+          .add(Objects.requireNonNull(recordWrapper.getRecord(), "Record cannot be null."));
       return this;
     }
 

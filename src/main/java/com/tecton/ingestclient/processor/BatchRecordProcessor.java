@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.errors.DataException;
+import org.apache.kafka.connect.errors.RetriableException;
 import org.apache.kafka.connect.sink.ErrantRecordReporter;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
   private final TectonHttpSinkConnectorConfig config;
   private final IRecordConverter tectonConverter;
   private final TectonHttpClient httpClient;
-  private final ErrantRecordReporter reporter;
+  private final Optional<ErrantRecordReporter> reporter;
 
   /**
    * Constructs a {@code BatchRecordProcessor} with the given dependencies.
@@ -41,11 +42,11 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * @param reporter The errant record reporter.
    * @param config Configuration for the processor.
    */
-  public BatchRecordProcessor(TectonHttpClient httpClient, ErrantRecordReporter reporter,
-      TectonHttpSinkConnectorConfig config) {
+  public BatchRecordProcessor(final TectonHttpClient httpClient,
+      final ErrantRecordReporter reporter, final TectonHttpSinkConnectorConfig config) {
     this.config = config;
     this.httpClient = httpClient;
-    this.reporter = reporter;
+    this.reporter = Optional.ofNullable(reporter);
     this.tectonConverter = new TectonRecordConverter(config);
   }
 
@@ -53,10 +54,23 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * Processes a collection of SinkRecords, transforms them to Tecton API requests, and sends them.
    *
    * @param records Collection of SinkRecords to be processed.
+   * @throws ConnectException if a non-retriable error occurs.
+   * @throws RetriableException if a retriable error occurs.
    */
   @Override
-  public void processRecords(Collection<SinkRecord> records) {
-    List<TectonApiRequest> batchRequests = partitionIntoBatches(records).stream()
+  public void processRecords(final Collection<SinkRecord> records)
+      throws ConnectException, RetriableException {
+    final List<SinkRecord> validRecords = new ArrayList<>();
+
+    for (SinkRecord record : records) {
+      try {
+        processSingleRecord(record, validRecords);
+      } catch (Exception e) {
+        reportErrantRecord(record, e);
+      }
+    }
+
+    final List<TectonApiRequest> batchRequests = partitionIntoBatches(validRecords).stream()
         .map(this::prepareBatchRequest).collect(Collectors.toList());
 
     processBatchRequests(batchRequests);
@@ -72,77 +86,100 @@ public class BatchRecordProcessor implements IRecordProcessor {
 
   /**
    * Partitions the collection of SinkRecords into batches.
+   *
+   * @param records Collection of SinkRecords to be partitioned.
+   * @return List of batches.
    */
-  private List<List<SinkRecord>> partitionIntoBatches(Collection<SinkRecord> records) {
+  private List<List<SinkRecord>> partitionIntoBatches(final List<SinkRecord> records) {
     final int batchSize = config.batchMaxSize;
-    List<SinkRecord> recordList = new ArrayList<>(records);
+    LOG.debug("Partitioning records into batches with max size: {}", batchSize);
 
-    return IntStream.range(0, (recordList.size() + batchSize - 1) / batchSize).mapToObj(
-        i -> recordList.subList(i * batchSize, Math.min(recordList.size(), (i + 1) * batchSize)))
-        .collect(Collectors.toList());
+    final List<SinkRecord> recordList = new ArrayList<>(records);
+
+    return IntStream.range(0, (recordList.size() + batchSize - 1) / batchSize).mapToObj(i -> {
+      int start = i * batchSize;
+      int end = Math.min(recordList.size(), (i + 1) * batchSize);
+      LOG.debug("Creating batch from index {} to {}", start, end);
+      return recordList.subList(start, end);
+    }).collect(Collectors.toList());
   }
 
   /**
    * Transforms a batch of SinkRecords into a Tecton API request.
+   *
+   * @param batch Batch of SinkRecords.
+   * @return TectonApiRequest.
    */
-  private TectonApiRequest prepareBatchRequest(List<SinkRecord> batch) {
-    TectonApiRequest.Builder requestBuilder = new TectonApiRequest.Builder()
+  private TectonApiRequest prepareBatchRequest(final List<SinkRecord> batch) {
+    LOG.debug("Preparing batch request with size: {}", batch.size());
+
+    final TectonApiRequest.Builder requestBuilder = new TectonApiRequest.Builder()
         .workspaceName(config.workspaceName).dryRun(config.dryRunEnabled);
 
-    batch.forEach(record -> processSingleRecord(record, requestBuilder));
+    for (SinkRecord record : batch) {
+      TectonRecord tectonRecord = tectonConverter.convert(record);
+      logProcessedRecord(tectonRecord);
+      String pushSourceName = resolvePushSourceName(record);
+      TectonApiRequest.RecordWrapper wrappedRecord =
+          new TectonApiRequest.RecordWrapper(pushSourceName, tectonRecord);
+
+      requestBuilder.addRecord(wrappedRecord);
+    }
+
     return requestBuilder.build();
   }
 
   /**
-   * Processes an individual SinkRecord.
+   * Processes a single SinkRecord, converts it, and adds it to the list of valid records if valid.
+   *
+   * @param record The SinkRecord to process.
+   * @param validRecords The list of valid records to add to if valid.
+   * @throws Exception If an error occurs during processing.
    */
-  private void processSingleRecord(SinkRecord record, TectonApiRequest.Builder requestBuilder) {
-    if (config.loggingEventDataEnabled) {
-      logDetailedRecordInfo(record);
-    }
-
-    try {
-      TectonRecord tectonRecord = tectonConverter.convert(record);
-      validateAndProcessRecordData(record, tectonRecord, requestBuilder);
-    } catch (Exception e) {
-      reportErrantRecord(record, e);
-    }
+  private void processSingleRecord(final SinkRecord record, final List<SinkRecord> validRecords)
+      throws Exception {
+    logSinkRecord(record);
+    TectonRecord tectonRecord = tectonConverter.convert(record);
+    validateAndAddRecord(record, tectonRecord, validRecords);
   }
 
   /**
    * Validates and processes a TectonRecord.
+   *
+   * @param record The original SinkRecord.
+   * @param tectonRecord The converted TectonRecord.
+   * @param validRecords The list of valid records to add to if valid.
    */
-  private void validateAndProcessRecordData(SinkRecord record, TectonRecord tectonRecord,
-      TectonApiRequest.Builder requestBuilder) {
+  private void validateAndAddRecord(final SinkRecord record, final TectonRecord tectonRecord,
+      final List<SinkRecord> validRecords) {
     if (!tectonRecord.isValid()) {
       LOG.warn("Invalid or empty record skipped from topic: {}", record.topic());
       reportErrantRecord(record, new DataException("Invalid TectonRecord."));
-      return;
+    } else {
+      validRecords.add(record);
     }
-
-    logProcessedRecord(tectonRecord);
-    String pushSourceName = resolvePushSourceName(record);
-    TectonApiRequest.RecordWrapper wrappedRecord =
-        new TectonApiRequest.RecordWrapper(pushSourceName, tectonRecord);
-
-    requestBuilder.addRecord(wrappedRecord);
   }
 
   /**
    * Logs the processed record data if loggingEventDataEnabled is enabled. Intended for debugging
    * purposes and could expose sensitive information to the logs.
+   *
+   * @param tectonRecord The TectonRecord to log.
    */
-  private void logProcessedRecord(TectonRecord tectonRecord) {
+  private void logProcessedRecord(final TectonRecord tectonRecord) {
     if (config.loggingEventDataEnabled) {
       LOG.debug("Processed Tecton Record: {}", tectonRecord);
     }
   }
 
   /**
-   * Derive the PushSourceName from the source topic if one is not already configured. Note the
+   * Derives the PushSourceName from the source topic if one is not already configured. Note the
    * PushSource(s) must be pre-configured in Tecton.
+   *
+   * @param record The SinkRecord to derive the push source name from.
+   * @return The push source name.
    */
-  private String resolvePushSourceName(SinkRecord record) {
+  private String resolvePushSourceName(final SinkRecord record) {
     return Optional.ofNullable(config.pushSourceName).filter(name -> !name.trim().isEmpty())
         .orElseGet(() -> {
           LOG.debug("pushSourceName is not set in config, using the topic name: {}",
@@ -153,45 +190,76 @@ public class BatchRecordProcessor implements IRecordProcessor {
 
   /**
    * Processes the batch requests synchronously or asynchronously depending on configuration.
+   *
+   * @param batchRequests List of TectonApiRequests to process.
+   * @throws ConnectException if a non-retriable error occurs.
+   * @throws RetriableException if a retriable error occurs.
    */
-  private void processBatchRequests(List<TectonApiRequest> batchRequests) {
+  private void processBatchRequests(final List<TectonApiRequest> batchRequests)
+      throws ConnectException, RetriableException {
     if (config.httpAsyncEnabled) {
+      LOG.debug("Sending {} batches", batchRequests.size());
       List<CompletableFuture<TectonApiResponse>> futures = httpClient.sendAsyncBatch(batchRequests);
       futures.forEach(this::handleFuture);
     } else {
-      batchRequests.forEach(httpClient::sendSync);
+      for (TectonApiRequest request : batchRequests) {
+        httpClient.sendSync(request);
+      }
     }
   }
 
   /**
-   * Handles asynchronous response exception.
+   * Handles asynchronous response exceptions.
+   *
+   * @param future The future representing the asynchronous operation.
    */
-  private void handleFuture(CompletableFuture<TectonApiResponse> future) {
+  private void handleFuture(final CompletableFuture<TectonApiResponse> future) {
     future.exceptionally(ex -> {
-      LOG.error("Error sending batch to Tecton", ex);
-      return null;
+      LOG.error("Error sending batch to Tecton: {}", ex.toString());
+      LOG.debug("Error details: ", ex);
+
+      if (ex instanceof ConnectException) {
+        throw (ConnectException) ex;
+      } else if (ex instanceof RetriableException) {
+        throw (RetriableException) ex;
+      } else {
+        throw new ConnectException("Unexpected error processing batch request", ex);
+      }
     });
   }
 
   /**
-   * Report failed records to the Kafka Connect ErrantRecordReporter if configured.
+   * Reports failed records to the Kafka Connect ErrantRecordReporter if configured.
+   *
+   * @param record The record that failed processing.
+   * @param e The exception that occurred.
    */
-  private void reportErrantRecord(SinkRecord record, Exception e) {
-    if (reporter != null) {
-      reporter.report(record, e);
+  private void reportErrantRecord(final SinkRecord record, final Exception e) {
+    if (reporter.isPresent()) {
+      try {
+        reporter.get().report(record, e);
+      } catch (Exception reportEx) {
+        LOG.error("Failed to report errant record: {}", reportEx.toString());
+        throw new ConnectException("Error reporting errant record", e);
+      }
     } else {
       throw new ConnectException("Error processing record", e);
     }
   }
 
   /**
-   * Log detailed Sink Record information. Beware, logs record value which may contain sensitive
+   * Logs detailed Sink Record information. Beware, logs record value which may contain sensitive
    * information.
+   *
+   * @param record The record to log.
    */
-  private void logDetailedRecordInfo(SinkRecord record) {
-    LOG.debug(
-        "Detailed record info: Topic: {}, Partition: {}, Offset: {}, Key: {}, Value: {}, Timestamp: {}, Headers: {}",
-        record.topic(), record.kafkaPartition(), record.kafkaOffset(), record.key(), record.value(),
-        record.timestamp() != null ? new Date(record.timestamp()) : "null", record.headers());
+  private void logSinkRecord(final SinkRecord record) {
+    if (config.loggingEventDataEnabled) {
+      LOG.debug(
+          "Detailed record info: Topic: {}, Partition: {}, Offset: {}, Key: {}, Value: {}, Timestamp: {}, Headers: {}",
+          record.topic(), record.kafkaPartition(), record.kafkaOffset(), record.key(),
+          record.value(), record.timestamp() != null ? new Date(record.timestamp()) : "null",
+          record.headers());
+    }
   }
 }

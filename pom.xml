@@ -1,114 +1,118 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tecton</groupId>
-    <artifactId>tecton-ingest-api-sink</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+	<groupId>com.tecton</groupId>
+	<artifactId>tecton-ingest-api-sink</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
 
-    <name>tecton-ingest-api-sink</name>
-    <description>A Kafka Connect Connector for tecton-ingest-api-sink</description>
+	<name>tecton-ingest-api-sink</name>
+	<description>A Kafka Connect Connector for tecton-ingest-api-sink</description>
 
 	<properties>
 		<jackson.version>2.15.2</jackson.version>
 		<slf4j.version>2.0.9</slf4j.version>
-		<logback.version>1.4.11</logback.version> 
+		<logback.version>1.4.11</logback.version>
 	</properties>
 
-    <parent>
-        <groupId>com.github.jcustenborder.kafka.connect</groupId>
-        <artifactId>kafka-connect-parent</artifactId>
-        <version>3.3.1-1</version>
-    </parent>
+	<parent>
+		<groupId>com.github.jcustenborder.kafka.connect</groupId>
+		<artifactId>kafka-connect-parent</artifactId>
+		<version>3.3.1-1</version>
+	</parent>
 
-    <scm>
-        <connection></connection>
-        <developerConnection></developerConnection>
-        <url></url>
-    </scm>
-    <issueManagement>
-        <system></system>
-        <url></url>
-    </issueManagement>
+	<scm>
+		<connection></connection>
+		<developerConnection></developerConnection>
+		<url></url>
+	</scm>
+
+	<issueManagement>
+		<system></system>
+		<url></url>
+	</issueManagement>
 
 	<dependencies>
 		<!-- Json Converter -->
 		<dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>connect-json</artifactId>
-            <scope>provided</scope>
-        </dependency>
-		
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>connect-json</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
 		<!-- Jackson core -->
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-core</artifactId>
-		    <version>${jackson.version}</version> <!-- Use the latest available version -->
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version> <!-- Use the latest available
+			version -->
 		</dependency>
-		
+
 		<!-- Jackson databind -->
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-databind</artifactId>
-		    <version>${jackson.version}</version> <!-- Use the latest available version -->
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version> <!-- Use the latest available
+			version -->
 		</dependency>
-		
+
 		<!-- Jackson annotations -->
 		<dependency>
-		    <groupId>com.fasterxml.jackson.core</groupId>
-		    <artifactId>jackson-annotations</artifactId>
-		    <version>${jackson.version}</version> <!-- Use the latest available version -->
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version> <!-- Use the latest available
+			version -->
 		</dependency>
 
 		<!-- Mockito core library -->
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-core</artifactId>
-		    <scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Mockito JUnit 5 integration -->
 		<dependency>
-		    <groupId>org.mockito</groupId>
-		    <artifactId>mockito-junit-jupiter</artifactId>
-		    <scope>test</scope>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- SLF4J API -->
 		<dependency>
-		    <groupId>org.slf4j</groupId>
-		    <artifactId>slf4j-api</artifactId>
-		    <version>${slf4j.version}</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
-		
+
 		<!-- Logback Classic (includes Logback Core) -->
 		<dependency>
-		    <groupId>ch.qos.logback</groupId>
-		    <artifactId>logback-classic</artifactId>
-		    <version>${logback.version}</version>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 
 	</dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <configuration>
-                    <skip>true</skip>
-                </configuration>
-            </plugin>
-<!--
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<!--
 Uncomment this second to generate a package to deploy to the Confluent Hub.
             <plugin>
                 <groupId>io.confluent</groupId>
                 <artifactId>kafka-connect-maven-plugin</artifactId>
                 <configuration>
                     <confluentControlCenterIntegration>true</confluentControlCenterIntegration>
-                    <documentationUrl>https://jcustenborder.github.io/kafka-connect-documentation/</documentationUrl>
+			<documentationUrl>https://jcustenborder.github.io/kafka-connect-documentation/</documentationUrl>
                     <componentTypes>
                         <componentType>sink</componentType>
                     </componentTypes>
@@ -117,15 +121,16 @@ Uncomment this second to generate a package to deploy to the Confluent Hub.
                     </tags>
                     <title>Kafka Connect ingest-api-sink</title>
                     <supportUrl>${pom.issueManagement.url}</supportUrl>
-                    <supportSummary>Support provided through community involvement.</supportSummary>
+                    <supportSummary>Support provided through community
+			involvement.</supportSummary>
                     <excludes>
                         <exclude>org.reflections:reflections</exclude>
                     </excludes>
                 </configuration>
             </plugin>
 -->
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 
 
 </project>

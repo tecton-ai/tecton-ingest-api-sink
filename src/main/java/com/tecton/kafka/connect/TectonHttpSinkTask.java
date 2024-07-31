@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import org.apache.kafka.clients.consumer.OffsetAndMetadata;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.sink.ErrantRecordReporter;
 import org.apache.kafka.connect.sink.SinkRecord;
 import org.apache.kafka.connect.sink.SinkTask;
@@ -32,7 +33,7 @@ public class TectonHttpSinkTask extends SinkTask {
     LOG.info("Starting TectonHttpSinkTask");
 
     config = new TectonHttpSinkConnectorConfig(settings);
-    TectonHttpClient httpClient = new TectonHttpClient(config);
+    TectonHttpClient httpClient = TectonHttpClient.create(config);
     recordProcessor =
         new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
 
@@ -46,8 +47,13 @@ public class TectonHttpSinkTask extends SinkTask {
       return;
     }
 
-    LOG.debug("Processing {} records", records.size());
-    recordProcessor.processRecords(records);
+    LOG.info("Processing {} records", records.size());
+    try {
+      recordProcessor.processRecords(records);
+    } catch (ConnectException e) {
+      LOG.error("Error processing records", e);
+      throw e;
+    }
   }
 
   @Override

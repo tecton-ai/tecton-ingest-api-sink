@@ -5,36 +5,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import com.tecton.ingestclient.util.JsonUtil;
 
 class TectonApiErrorTest {
 
-  private TectonApiError tectonApiError;
   private TectonApiError.RequestError requestError;
   private TectonApiError.RecordError recordError;
 
   @BeforeEach
   void setUp() {
-    tectonApiError = new TectonApiError();
-    requestError = new TectonApiError.RequestError();
-    recordError = new TectonApiError.RecordError();
+    requestError = new TectonApiError.RequestError("Sample Error", "Type A");
+    recordError = new TectonApiError.RecordError("View A", "Source X", "Type B", "Sample Error");
   }
 
   @Test
   void testRequestErrorFields() {
-    requestError.setErrorMessage("Sample Error");
-    requestError.setErrorType("Type A");
-
     assertEquals("Sample Error", requestError.getErrorMessage());
     assertEquals("Type A", requestError.getErrorType());
   }
 
   @Test
   void testRecordErrorFields() {
-    recordError.setErrorMessage("Sample Error");
-    recordError.setErrorType("Type B");
-    recordError.setFeatureViewName("View A");
-    recordError.setPushSourceName("Source X");
-
     assertEquals("Sample Error", recordError.getErrorMessage());
     assertEquals("Type B", recordError.getErrorType());
     assertEquals("View A", recordError.getFeatureViewName());
@@ -43,9 +34,8 @@ class TectonApiErrorTest {
 
   @Test
   void testTectonApiErrorFields() {
-    tectonApiError.setRequestError(requestError);
-    tectonApiError.setWorkspaceName("Workspace 1");
-    tectonApiError.setRecordErrors(Collections.singletonList(recordError));
+    TectonApiError tectonApiError =
+        new TectonApiError(requestError, "Workspace 1", Collections.singletonList(recordError));
 
     assertEquals(requestError, tectonApiError.getRequestError());
     assertEquals("Workspace 1", tectonApiError.getWorkspaceName());
@@ -55,41 +45,32 @@ class TectonApiErrorTest {
 
   @Test
   void testRequestErrorToString() {
-    requestError.setErrorMessage("Sample Error");
-    requestError.setErrorType("Type A");
-
     String json = requestError.toString();
     assertTrue(json.contains("Sample Error"));
     assertTrue(json.contains("Type A"));
+
+    // Verify JSON conversion using JsonUtil
+    String expectedJson = JsonUtil.toJson(requestError);
+    assertEquals(expectedJson, json);
   }
 
   @Test
   void testRecordErrorToString() {
-    recordError.setErrorMessage("Sample Error");
-    recordError.setErrorType("Type B");
-    recordError.setFeatureViewName("View A");
-    recordError.setPushSourceName("Source X");
-
     String json = recordError.toString();
     assertTrue(json.contains("Sample Error"));
     assertTrue(json.contains("Type B"));
     assertTrue(json.contains("View A"));
     assertTrue(json.contains("Source X"));
+
+    // Verify JSON conversion using JsonUtil
+    String expectedJson = JsonUtil.toJson(recordError);
+    assertEquals(expectedJson, json);
   }
 
   @Test
   void testTectonApiErrorToString() {
-    // Populating the requestError and recordError objects before they are added to tectonApiError
-    requestError.setErrorMessage("Sample Error");
-    requestError.setErrorType("Type A");
-    recordError.setErrorMessage("Sample Error");
-    recordError.setErrorType("Type B");
-    recordError.setFeatureViewName("View A");
-    recordError.setPushSourceName("Source X");
-
-    tectonApiError.setRequestError(requestError);
-    tectonApiError.setWorkspaceName("Workspace 1");
-    tectonApiError.setRecordErrors(Collections.singletonList(recordError));
+    TectonApiError tectonApiError =
+        new TectonApiError(requestError, "Workspace 1", Collections.singletonList(recordError));
 
     String json = tectonApiError.toString();
     assertTrue(json.contains("Workspace 1"));
@@ -98,5 +79,9 @@ class TectonApiErrorTest {
     assertTrue(json.contains("Type B"));
     assertTrue(json.contains("View A"));
     assertTrue(json.contains("Source X"));
+
+    // Verify JSON conversion using JsonUtil
+    String expectedJson = JsonUtil.toJson(tectonApiError);
+    assertEquals(expectedJson, json);
   }
 }

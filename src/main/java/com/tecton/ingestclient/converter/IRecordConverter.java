@@ -14,21 +14,21 @@ import org.apache.kafka.connect.sink.SinkRecord;
  */
 public interface IRecordConverter {
 
-    /**
-     * Converts a {@code SinkRecord} from Kafka into a {@code TectonRecord}.
-     *
-     * @param record The Kafka sink record to be converted.
-     * @return A {@code TectonRecord} representing the converted data ready for ingestion to Tecton.
-     */
-    TectonRecord convert(SinkRecord record);
+  /**
+   * Converts a {@code SinkRecord} from Kafka into a {@code TectonRecord}.
+   *
+   * @param record The Kafka sink record to be converted.
+   * @return A {@code TectonRecord} representing the converted data ready for ingestion to Tecton.
+   */
+  TectonRecord convert(SinkRecord record);
 
-    /**
-     * Closes the converter, releasing any resources that were acquired.
-     *
-     * <p>
-     * This method should be called when the converter is no longer needed, allowing it to perform
-     * cleanup operations such as closing connections, releasing file handles, etc.
-     * </p>
-     */
-    void close();
+  /**
+   * Closes the converter, releasing any resources that were acquired.
+   *
+   * <p>
+   * This method should be called when the converter is no longer needed, allowing it to perform
+   * cleanup operations such as closing connections, releasing file handles, etc.
+   * </p>
+   */
+  void close();
 }

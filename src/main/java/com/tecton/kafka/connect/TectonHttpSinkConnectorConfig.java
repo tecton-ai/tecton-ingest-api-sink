@@ -41,6 +41,8 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
   protected static final String KAFKA_TIMESTAMP_ENABLED_CONFIG = "tecton.kafka.timestamp.enabled";
   protected static final String KAFKA_KEY_ENABLED_CONFIG = "tecton.kafka.key.enabled";
   protected static final String KAFKA_HEADERS_ENABLED_CONFIG = "tecton.kafka.headers.enabled";
+  protected static final String KAFKA_SANITISE_KEYS_ENABLED_CONFIG =
+      "tecton.kafka.sanitise.keys.enabled";
 
   // Logging configuration
   protected static final String LOGGING_EVENT_DATA_ENABLED_CONFIG =
@@ -61,8 +63,10 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
       "Limits the number of concurrent HTTP requests to the Tecton Ingest API when asynchronous sending is enabled.";
 
   // Tecton Payload-related Documentation
-  static final String WORKSPACE_NAME_DOC = "The name of the workspace where the Push Sources(s) are defined";
-  static final String PUSH_SOURCE_NAME_DOC = "The name of the Tecton Push Source to write the record(s) to.";
+  static final String WORKSPACE_NAME_DOC =
+      "The name of the workspace where the Push Sources(s) are defined";
+  static final String PUSH_SOURCE_NAME_DOC =
+      "The name of the Tecton Push Source to write the record(s) to.";
   static final String DRY_RUN_ENABLED_DOC =
       "When set to True, the request will be validated but no events will be written to the Online Store.";
   static final String BATCH_MAX_SIZE_DOC =
@@ -75,6 +79,8 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
       "Indicates whether to include the Kafka key in the Tecton record.";
   static final String KAFKA_HEADERS_ENABLED_DOC =
       "Indicates whether to include the Kafka headers in the Tecton record.";
+  static final String KAFKA_SANITISE_KEYS_ENABLED_DOC =
+      "Indicates whether to sanitise the JSON keys in the Tecton record.";
 
   // Logging Documentation
   static final String LOGGING_EVENT_DATA_ENABLED_DOC =
@@ -94,6 +100,7 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
   public final boolean kafkaTimestampEnabled;
   public final boolean kafkaKeyEnabled;
   public final boolean kafkaHeadersEnabled;
+  public final boolean kafkaSanitiseKeysEnabled;
   public final boolean loggingEventDataEnabled;
 
   /**
@@ -117,6 +124,7 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
     this.kafkaTimestampEnabled = this.getBoolean(KAFKA_TIMESTAMP_ENABLED_CONFIG);
     this.kafkaKeyEnabled = this.getBoolean(KAFKA_KEY_ENABLED_CONFIG);
     this.kafkaHeadersEnabled = this.getBoolean(KAFKA_HEADERS_ENABLED_CONFIG);
+    this.kafkaSanitiseKeysEnabled = this.getBoolean(KAFKA_SANITISE_KEYS_ENABLED_CONFIG);
     this.loggingEventDataEnabled = this.getBoolean(LOGGING_EVENT_DATA_ENABLED_CONFIG);
   }
 
@@ -129,76 +137,44 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
     return new ConfigDef()
         // HTTP-related configurations
         .define(ConfigKeyBuilder.of(HTTP_CLUSTER_ENDPOINT_CONFIG, STRING)
-            .documentation(HTTP_CLUSTER_ENDPOINT_DOC)
-            .importance(HIGH)
-            .build())
+            .documentation(HTTP_CLUSTER_ENDPOINT_DOC).importance(HIGH).build())
         .define(ConfigKeyBuilder.of(HTTP_AUTH_TOKEN_CONFIG, PASSWORD)
-            .documentation(HTTP_AUTH_TOKEN_DOC)
-            .importance(HIGH)
-            .build())
+            .documentation(HTTP_AUTH_TOKEN_DOC).importance(HIGH).build())
         .define(ConfigKeyBuilder.of(HTTP_CONNECT_TIMEOUT_CONFIG, INT)
-            .documentation(HTTP_CONNECT_TIMEOUT_DOC)
-            .importance(MEDIUM)
-            .defaultValue(DEFAULT_TIMEOUT_SECONDS)
-            .build())
+            .documentation(HTTP_CONNECT_TIMEOUT_DOC).importance(MEDIUM)
+            .defaultValue(DEFAULT_TIMEOUT_SECONDS).build())
         .define(ConfigKeyBuilder.of(HTTP_REQUEST_TIMEOUT_CONFIG, INT)
-            .documentation(HTTP_REQUEST_TIMEOUT_DOC)
-            .importance(MEDIUM)
-            .defaultValue(DEFAULT_TIMEOUT_SECONDS)
-            .build())
+            .documentation(HTTP_REQUEST_TIMEOUT_DOC).importance(MEDIUM)
+            .defaultValue(DEFAULT_TIMEOUT_SECONDS).build())
         .define(ConfigKeyBuilder.of(HTTP_ASYNC_ENABLED_CONFIG, BOOLEAN)
-            .documentation(HTTP_ASYNC_ENABLED_DOC)
-            .importance(MEDIUM)
-            .defaultValue(true)
-            .build())
+            .documentation(HTTP_ASYNC_ENABLED_DOC).importance(MEDIUM).defaultValue(true).build())
         .define(ConfigKeyBuilder.of(HTTP_CONCURRENCY_LIMIT_CONFIG, INT)
-            .documentation(HTTP_CONCURRENCY_LIMIT_DOC)
-            .importance(MEDIUM)
-            .defaultValue(50)
-            .build())
+            .documentation(HTTP_CONCURRENCY_LIMIT_DOC).importance(MEDIUM).defaultValue(50).build())
 
         // Tecton payload related configurations
-        .define(ConfigKeyBuilder.of(WORKSPACE_NAME_CONFIG, STRING)
-            .documentation(WORKSPACE_NAME_DOC)
-            .importance(HIGH)
-            .build())
+        .define(ConfigKeyBuilder.of(WORKSPACE_NAME_CONFIG, STRING).documentation(WORKSPACE_NAME_DOC)
+            .importance(HIGH).build())
         .define(ConfigKeyBuilder.of(PUSH_SOURCE_NAME_CONFIG, STRING)
-            .documentation(PUSH_SOURCE_NAME_DOC)
-            .importance(MEDIUM)
-            .build())
+            .documentation(PUSH_SOURCE_NAME_DOC).importance(MEDIUM).build())
         .define(ConfigKeyBuilder.of(DRY_RUN_ENABLED_CONFIG, BOOLEAN)
-            .documentation(DRY_RUN_ENABLED_DOC)
-            .importance(MEDIUM)
-            .defaultValue(true)
-            .build())
-        .define(ConfigKeyBuilder.of(BATCH_MAX_SIZE_CONFIG, INT)
-            .documentation(BATCH_MAX_SIZE_DOC)
-            .importance(MEDIUM)
-            .defaultValue(DEFAULT_BATCH_MAX_SIZE)
-            .build())
+            .documentation(DRY_RUN_ENABLED_DOC).importance(MEDIUM).defaultValue(true).build())
+        .define(ConfigKeyBuilder.of(BATCH_MAX_SIZE_CONFIG, INT).documentation(BATCH_MAX_SIZE_DOC)
+            .importance(MEDIUM).defaultValue(DEFAULT_BATCH_MAX_SIZE).build())
 
         // Kafka-related configuration
         .define(ConfigKeyBuilder.of(KAFKA_TIMESTAMP_ENABLED_CONFIG, BOOLEAN)
-            .documentation(KAFKA_TIMESTAMP_ENABLED_DOC)
-            .importance(LOW)
-            .defaultValue(false)
-            .build())
+            .documentation(KAFKA_TIMESTAMP_ENABLED_DOC).importance(LOW).defaultValue(false).build())
         .define(ConfigKeyBuilder.of(KAFKA_KEY_ENABLED_CONFIG, BOOLEAN)
-            .documentation(KAFKA_KEY_ENABLED_DOC)
-            .importance(LOW)
-            .defaultValue(false)
-            .build())
+            .documentation(KAFKA_KEY_ENABLED_DOC).importance(LOW).defaultValue(false).build())
         .define(ConfigKeyBuilder.of(KAFKA_HEADERS_ENABLED_CONFIG, BOOLEAN)
-            .documentation(KAFKA_HEADERS_ENABLED_DOC)
-            .importance(LOW)
-            .defaultValue(false)
+            .documentation(KAFKA_HEADERS_ENABLED_DOC).importance(LOW).defaultValue(false).build())
+        .define(ConfigKeyBuilder.of(KAFKA_SANITISE_KEYS_ENABLED_CONFIG, BOOLEAN)
+            .documentation(KAFKA_SANITISE_KEYS_ENABLED_DOC).importance(LOW).defaultValue(false)
             .build())
 
         // Logging-related configurations
         .define(ConfigKeyBuilder.of(LOGGING_EVENT_DATA_ENABLED_CONFIG, BOOLEAN)
-            .documentation(LOGGING_EVENT_DATA_ENABLED_DOC)
-            .importance(LOW)
-            .defaultValue(false)
+            .documentation(LOGGING_EVENT_DATA_ENABLED_DOC).importance(LOW).defaultValue(false)
             .build());
   }
 }

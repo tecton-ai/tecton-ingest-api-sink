@@ -12,77 +12,59 @@ import com.tecton.ingestclient.client.TectonApiResponse.IngestMetrics.FeatureVie
 
 class TectonApiResponseTest {
 
-    private TectonApiResponse response;
-    private IngestMetrics ingestMetrics;
-    private FeatureViewMetric featureViewMetric;
+  private TectonApiResponse response;
+  private IngestMetrics ingestMetrics;
+  private FeatureViewMetric featureViewMetric;
 
-    @BeforeEach
-    void setUp() {
-        response = new TectonApiResponse();
-        ingestMetrics = new IngestMetrics();
-        featureViewMetric = new FeatureViewMetric();
+  @BeforeEach
+  void setUp() {
+    featureViewMetric = new FeatureViewMetric("featureTest", "10", "20", "fvId");
+    List<FeatureViewMetric> metricsList = new ArrayList<>();
+    metricsList.add(featureViewMetric);
+    ingestMetrics = new IngestMetrics(metricsList, null);
+    response = new TectonApiResponse("testWorkspace", ingestMetrics);
+  }
 
-        // Setting default values
-        response.setWorkspaceName("testWorkspace");
-        response.setIngestMetrics(ingestMetrics);
+  @Test
+  void testGetWorkspaceName() {
+    assertEquals("testWorkspace", response.getWorkspaceName());
+  }
 
-        featureViewMetric.setFeatureViewName("featureTest");
-        featureViewMetric.setOnlineRecordIngestCount("10");
-        featureViewMetric.setOfflineRecordIngestCount("20");
+  @Test
+  void testGetIngestMetrics() {
+    assertNotNull(response.getIngestMetrics());
+  }
 
-        List<FeatureViewMetric> metricsList = new ArrayList<>();
-        metricsList.add(featureViewMetric);
-        ingestMetrics.setFeatureViewIngestMetrics(metricsList);
-    }
+  @Test
+  void testIngestMetricsGetFeatureViewIngestMetrics() {
+    assertNotNull(ingestMetrics.getFeatureViewIngestMetrics());
+    assertEquals(1, ingestMetrics.getFeatureViewIngestMetrics().size());
+  }
 
-    @Test
-    void testGetWorkspaceName() {
-        assertEquals("testWorkspace", response.getWorkspaceName());
-    }
+  @Test
+  void testFeatureViewMetricGetFeatureViewName() {
+    assertEquals("featureTest", featureViewMetric.getFeatureViewName());
+  }
 
-    @Test
-    void testSetWorkspaceName() {
-        response.setWorkspaceName("updatedWorkspace");
-        assertEquals("updatedWorkspace", response.getWorkspaceName());
-    }
+  @Test
+  void testFeatureViewMetricGetOnlineRecordIngestCount() {
+    assertEquals("10", featureViewMetric.getOnlineRecordIngestCount());
+  }
 
-    @Test
-    void testGetIngestMetrics() {
-        assertNotNull(response.getIngestMetrics());
-    }
+  @Test
+  void testFeatureViewMetricGetOfflineRecordIngestCount() {
+    assertEquals("20", featureViewMetric.getOfflineRecordIngestCount());
+  }
 
-    @Test
-    void testSetIngestMetrics() {
-        IngestMetrics newMetrics = new IngestMetrics();
-        response.setIngestMetrics(newMetrics);
-        assertEquals(newMetrics, response.getIngestMetrics());
-    }
+  @Test
+  void testFeatureViewMetricGetFeatureViewId() {
+    assertEquals("fvId", featureViewMetric.getFeatureViewId());
+  }
 
-    @Test
-    void testIngestMetricsGetFeatureViewIngestMetrics() {
-        assertNotNull(ingestMetrics.getFeatureViewIngestMetrics());
-        assertEquals(1, ingestMetrics.getFeatureViewIngestMetrics().size());
-    }
-
-    @Test
-    void testFeatureViewMetricGetFeatureViewName() {
-        assertEquals("featureTest", featureViewMetric.getFeatureViewName());
-    }
-
-    @Test
-    void testFeatureViewMetricGetOnlineRecordIngestCount() {
-        assertEquals("10", featureViewMetric.getOnlineRecordIngestCount());
-    }
-
-    @Test
-    void testFeatureViewMetricGetOfflineRecordIngestCount() {
-        assertEquals("20", featureViewMetric.getOfflineRecordIngestCount());
-    }
-
-    @Test
-    void testToStringContainsWorkspaceName() {
-        String jsonString = response.toString();
-        assertNotNull(jsonString);
-        assertTrue(jsonString.contains("testWorkspace"));
-    }
+  @Test
+  void testToStringContainsWorkspaceName() {
+    String jsonString = response.toString();
+    assertNotNull(jsonString);
+    assertTrue(jsonString.contains("testWorkspace"));
+  }
 }

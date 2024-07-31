@@ -5,15 +5,12 @@ import java.util.Map;
 import org.apache.kafka.connect.errors.DataException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tecton.ingestclient.util.JsonUtil;
 
 /**
  * Represents a Tecton Record with associated Kafka metadata.
  */
 public class TectonRecord {
-
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   @JsonProperty("record")
   private final Map<String, Object> recordData;
@@ -54,7 +51,8 @@ public class TectonRecord {
    * @return True if the object is a valid Tecton type; false otherwise.
    */
   private static boolean isValidTectonValue(final Object value) {
-    if ((value == null) || value instanceof String || value instanceof Number || value instanceof Boolean) {
+    if (value == null || value instanceof String || value instanceof Number
+        || value instanceof Boolean) {
       return true;
     }
     if (value instanceof List) {
@@ -75,8 +73,8 @@ public class TectonRecord {
    */
   public String toJson() throws DataException {
     try {
-      return OBJECT_MAPPER.writeValueAsString(this);
-    } catch (JsonProcessingException e) {
+      return JsonUtil.toJson(this);
+    } catch (Exception e) {
       throw new DataException("Failed to convert TectonRecord to JSON string.", e);
     }
   }
