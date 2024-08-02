@@ -39,7 +39,8 @@ public class TectonHttpSinkTask extends SinkTask {
 
     config = new TectonHttpSinkConnectorConfig(settings);
     ITectonHttpClient httpClient = ITectonHttpClient.create(config);
-    recordProcessor = new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
+    recordProcessor =
+        new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
 
     LOG.info("TectonHttpSinkTask initialised successfully");
   }

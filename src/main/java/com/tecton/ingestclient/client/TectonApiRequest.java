@@ -1,6 +1,7 @@
 package com.tecton.ingestclient.client;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tecton.ingestclient.converter.TectonRecord;
 import com.tecton.ingestclient.util.JsonUtil;
@@ -16,6 +17,7 @@ public class TectonApiRequest {
   private final String workspaceName;
   @JsonProperty("dry_run")
   private final boolean dryRun;
+  @JsonProperty("records")
   private final Map<String, List<TectonRecord>> records;
 
   /**
@@ -27,11 +29,12 @@ public class TectonApiRequest {
    */
   @JsonCreator
   public TectonApiRequest(@JsonProperty("workspace_name") String workspaceName,
-                          @JsonProperty("dry_run") boolean dryRun,
-                          @JsonProperty("records") Map<String, List<TectonRecord>> records) {
+      @JsonProperty("dry_run") boolean dryRun,
+      @JsonProperty("records") Map<String, List<TectonRecord>> records) {
     this.workspaceName = Objects.requireNonNull(workspaceName, "Workspace name cannot be null.");
     this.dryRun = dryRun;
-    this.records = Collections.unmodifiableMap(new HashMap<>(Objects.requireNonNull(records, "Records cannot be null.")));
+    this.records = Collections
+        .unmodifiableMap(new HashMap<>(Objects.requireNonNull(records, "Records cannot be null.")));
   }
 
   /**
@@ -66,6 +69,7 @@ public class TectonApiRequest {
    *
    * @return the total number of records associated with the request.
    */
+  @JsonIgnore
   public int getRecordCount() {
     return records.values().stream().mapToInt(List::size).sum();
   }
@@ -80,7 +84,9 @@ public class TectonApiRequest {
    */
   public static class RecordWrapper {
 
+    @JsonProperty("pushSource")
     private final String pushSource;
+    @JsonProperty("record")
     private final TectonRecord record;
 
     /**
@@ -89,7 +95,8 @@ public class TectonApiRequest {
      * @param pushSource the source of the push. Must not be null.
      * @param record the record data. Must not be null.
      */
-    public RecordWrapper(String pushSource, TectonRecord record) {
+    public RecordWrapper(@JsonProperty("pushSource") String pushSource,
+        @JsonProperty("record") TectonRecord record) {
       this.pushSource = Objects.requireNonNull(pushSource, "Push source cannot be null.");
       this.record = Objects.requireNonNull(record, "Record cannot be null.");
     }
@@ -175,6 +182,7 @@ public class TectonApiRequest {
      *
      * @return true if there are records, otherwise false.
      */
+    @JsonIgnore
     public boolean hasRecords() {
       return !records.isEmpty();
     }
@@ -184,6 +192,7 @@ public class TectonApiRequest {
      *
      * @return the total number of records.
      */
+    @JsonIgnore
     public int getRecordCount() {
       return records.values().stream().mapToInt(List::size).sum();
     }

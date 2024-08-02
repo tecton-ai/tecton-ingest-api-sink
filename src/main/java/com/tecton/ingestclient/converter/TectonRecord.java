@@ -52,15 +52,16 @@ public class TectonRecord {
    * @return True if the object is a valid Tecton type; false otherwise.
    */
   private static boolean isValidTectonValue(final Object value) {
-    if (value == null || value instanceof String || value instanceof Number || value instanceof Boolean) {
+    if (value == null || value instanceof String || value instanceof Number
+        || value instanceof Boolean) {
       return true;
     }
     if (value instanceof List) {
       return ((List<?>) value).stream().allMatch(TectonRecord::isValidTectonValue);
     }
     if (value instanceof Map) {
-      return ((Map<?, ?>) value).keySet().stream().allMatch(key -> key instanceof String) &&
-             ((Map<?, ?>) value).values().stream().allMatch(TectonRecord::isValidTectonValue);
+      return ((Map<?, ?>) value).keySet().stream().allMatch(key -> key instanceof String)
+          && ((Map<?, ?>) value).values().stream().allMatch(TectonRecord::isValidTectonValue);
     }
     return false;
   }

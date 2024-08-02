@@ -44,8 +44,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * @param config Configuration for the processor.
    */
   public BatchRecordProcessor(final ITectonHttpClient httpClient,
-                              final ErrantRecordReporter reporter, 
-                              final TectonHttpSinkConnectorConfig config) {
+      final ErrantRecordReporter reporter, final TectonHttpSinkConnectorConfig config) {
     this.config = config;
     this.httpClient = httpClient;
     this.reporter = Optional.ofNullable(reporter);
@@ -82,11 +81,14 @@ public class BatchRecordProcessor implements IRecordProcessor {
 
     try {
       if (config.httpAsyncEnabled) {
-        List<CompletableFuture<TectonApiResponse>> futures = httpClient.sendAsyncBatch(batchRequests);
-        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        List<CompletableFuture<TectonApiResponse>> futures =
+            httpClient.sendAsyncBatch(batchRequests);
+        CompletableFuture<Void> allFutures =
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
 
         allFutures.thenRun(() -> {
-          sentCount.addAndGet(batchRequests.stream().mapToInt(TectonApiRequest::getRecordCount).sum());
+          sentCount
+              .addAndGet(batchRequests.stream().mapToInt(TectonApiRequest::getRecordCount).sum());
         }).exceptionally(ex -> {
           LOG.error("Error sending records to Tecton", ex);
           return null;
@@ -154,7 +156,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
 
       requestBuilder.addRecord(wrappedRecord);
     }
-    
+
     return requestBuilder.build();
   }
 
@@ -180,7 +182,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * @param validRecords The list of valid records to add to if valid.
    */
   private void validateAndAddRecord(final SinkRecord record, final TectonRecord tectonRecord,
-                                    final List<SinkRecord> validRecords) {
+      final List<SinkRecord> validRecords) {
     if (!tectonRecord.isValid()) {
       LOG.warn("Invalid or empty record skipped from topic: {}", record.topic());
       reportErrantRecord(record, new DataException("Invalid TectonRecord."));

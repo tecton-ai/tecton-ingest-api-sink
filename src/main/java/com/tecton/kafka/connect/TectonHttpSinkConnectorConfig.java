@@ -36,27 +36,44 @@ public class TectonHttpSinkConnectorConfig extends AbstractConfig {
   protected static final String KAFKA_TIMESTAMP_ENABLED_CONFIG = "tecton.kafka.timestamp.enabled";
   protected static final String KAFKA_KEY_ENABLED_CONFIG = "tecton.kafka.key.enabled";
   protected static final String KAFKA_HEADERS_ENABLED_CONFIG = "tecton.kafka.headers.enabled";
-  protected static final String KAFKA_SANITISE_KEYS_ENABLED_CONFIG = "tecton.kafka.sanitise.keys.enabled";
+  protected static final String KAFKA_SANITISE_KEYS_ENABLED_CONFIG =
+      "tecton.kafka.sanitise.keys.enabled";
 
   // Logging configuration
-  protected static final String LOGGING_EVENT_DATA_ENABLED_CONFIG = "tecton.logging.event.data.enabled";
+  protected static final String LOGGING_EVENT_DATA_ENABLED_CONFIG =
+      "tecton.logging.event.data.enabled";
 
   // Documentation
-  static final String HTTP_CLUSTER_ENDPOINT_DOC = "The endpoint of your Tecton cluster, formatted as: https://<your_cluster>.tecton.ai.";
-  static final String HTTP_AUTH_TOKEN_DOC = "The authorization token used to authenticate requests to the Tecton Ingest API.";
-  static final String HTTP_CONNECT_TIMEOUT_DOC = "The HTTP connect timeout for the Tecton Ingest API in seconds.";
-  static final String HTTP_REQUEST_TIMEOUT_DOC = "The HTTP request timeout for the Tecton Ingest API in seconds.";
-  static final String HTTP_ASYNC_ENABLED_DOC = "Enables HTTP asynchronous sending to allow concurrent requests to Tecton Ingest API. Event order cannot be guaranteed.";
-  static final String HTTP_CONCURRENCY_LIMIT_DOC = "Limits the number of concurrent HTTP requests to the Tecton Ingest API when asynchronous sending is enabled.";
-  static final String WORKSPACE_NAME_DOC = "The name of the workspace where the Push Sources(s) are defined";
-  static final String PUSH_SOURCE_NAME_DOC = "The name of the Tecton Push Source to write the record(s) to.";
-  static final String DRY_RUN_ENABLED_DOC = "When set to True, the request will be validated but no events will be written to the Online Store.";
-  static final String BATCH_MAX_SIZE_DOC = "The maximum size of the batch of events sent to Tecton. There is currently no limit for Ingest API, but Tecton recommends 10.";
-  static final String KAFKA_TIMESTAMP_ENABLED_DOC = "Indicates whether to include the Kafka timestamp in the Tecton record.";
-  static final String KAFKA_KEY_ENABLED_DOC = "Indicates whether to include the Kafka key in the Tecton record.";
-  static final String KAFKA_HEADERS_ENABLED_DOC = "Indicates whether to include the Kafka headers in the Tecton record.";
-  static final String KAFKA_SANITISE_KEYS_ENABLED_DOC = "Indicates whether to sanitise the JSON keys in the Tecton record.";
-  static final String LOGGING_EVENT_DATA_ENABLED_DOC = "Determines whether the event data should be logged for debugging purposes. Enabling could risk sensitive data appearing in logs.";
+  static final String HTTP_CLUSTER_ENDPOINT_DOC =
+      "The endpoint of your Tecton cluster, formatted as: https://<your_cluster>.tecton.ai.";
+  static final String HTTP_AUTH_TOKEN_DOC =
+      "The authorization token used to authenticate requests to the Tecton Ingest API.";
+  static final String HTTP_CONNECT_TIMEOUT_DOC =
+      "The HTTP connect timeout for the Tecton Ingest API in seconds.";
+  static final String HTTP_REQUEST_TIMEOUT_DOC =
+      "The HTTP request timeout for the Tecton Ingest API in seconds.";
+  static final String HTTP_ASYNC_ENABLED_DOC =
+      "Enables HTTP asynchronous sending to allow concurrent requests to Tecton Ingest API. Event order cannot be guaranteed.";
+  static final String HTTP_CONCURRENCY_LIMIT_DOC =
+      "Limits the number of concurrent HTTP requests to the Tecton Ingest API when asynchronous sending is enabled.";
+  static final String WORKSPACE_NAME_DOC =
+      "The name of the workspace where the Push Sources(s) are defined";
+  static final String PUSH_SOURCE_NAME_DOC =
+      "The name of the Tecton Push Source to write the record(s) to.";
+  static final String DRY_RUN_ENABLED_DOC =
+      "When set to True, the request will be validated but no events will be written to the Online Store.";
+  static final String BATCH_MAX_SIZE_DOC =
+      "The maximum size of the batch of events sent to Tecton. There is currently no limit for Ingest API, but Tecton recommends 10.";
+  static final String KAFKA_TIMESTAMP_ENABLED_DOC =
+      "Indicates whether to include the Kafka timestamp in the Tecton record.";
+  static final String KAFKA_KEY_ENABLED_DOC =
+      "Indicates whether to include the Kafka key in the Tecton record.";
+  static final String KAFKA_HEADERS_ENABLED_DOC =
+      "Indicates whether to include the Kafka headers in the Tecton record.";
+  static final String KAFKA_SANITISE_KEYS_ENABLED_DOC =
+      "Indicates whether to sanitise the JSON keys in the Tecton record.";
+  static final String LOGGING_EVENT_DATA_ENABLED_DOC =
+      "Determines whether the event data should be logged for debugging purposes. Enabling could risk sensitive data appearing in logs.";
 
   // Configuration parameters
   public final String httpAuthToken;

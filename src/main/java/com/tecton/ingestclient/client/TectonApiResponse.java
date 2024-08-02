@@ -1,9 +1,10 @@
 package com.tecton.ingestclient.client;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tecton.ingestclient.util.JsonUtil;
+
+import java.util.List;
 
 /**
  * Represents a response from the Tecton API containing workspace information and ingestion metrics.
@@ -12,7 +13,10 @@ import com.tecton.ingestclient.util.JsonUtil;
  */
 public class TectonApiResponse {
 
+  @JsonProperty("workspaceName")
   private final String workspaceName;
+
+  @JsonProperty("ingestMetrics")
   private final IngestMetrics ingestMetrics;
 
   /**
@@ -23,7 +27,7 @@ public class TectonApiResponse {
    */
   @JsonCreator
   public TectonApiResponse(@JsonProperty("workspaceName") String workspaceName,
-                           @JsonProperty("ingestMetrics") IngestMetrics ingestMetrics) {
+      @JsonProperty("ingestMetrics") IngestMetrics ingestMetrics) {
     this.workspaceName = workspaceName;
     this.ingestMetrics = ingestMetrics;
   }
@@ -56,7 +60,10 @@ public class TectonApiResponse {
    */
   public static class IngestMetrics {
 
+    @JsonProperty("featureViewIngestMetrics")
     private final List<FeatureViewMetric> featureViewIngestMetrics;
+
+    @JsonProperty("dataSourceIngestMetrics")
     private final List<DataSourceMetric> dataSourceIngestMetrics;
 
     /**
@@ -66,8 +73,9 @@ public class TectonApiResponse {
      * @param dataSourceIngestMetrics the list of data source metrics
      */
     @JsonCreator
-    public IngestMetrics(@JsonProperty("featureViewIngestMetrics") List<FeatureViewMetric> featureViewIngestMetrics,
-                         @JsonProperty("dataSourceIngestMetrics") List<DataSourceMetric> dataSourceIngestMetrics) {
+    public IngestMetrics(
+        @JsonProperty("featureViewIngestMetrics") List<FeatureViewMetric> featureViewIngestMetrics,
+        @JsonProperty("dataSourceIngestMetrics") List<DataSourceMetric> dataSourceIngestMetrics) {
       this.featureViewIngestMetrics = featureViewIngestMetrics;
       this.dataSourceIngestMetrics = dataSourceIngestMetrics;
     }
@@ -100,8 +108,13 @@ public class TectonApiResponse {
      */
     public static class DataSourceMetric {
 
+      @JsonProperty("dataSourceName")
       private final String dataSourceName;
+
+      @JsonProperty("offlineRecordIngestCount")
       private final String offlineRecordIngestCount;
+
+      @JsonProperty("dataSourceId")
       private final String dataSourceId;
 
       /**
@@ -113,8 +126,8 @@ public class TectonApiResponse {
        */
       @JsonCreator
       public DataSourceMetric(@JsonProperty("dataSourceName") String dataSourceName,
-                              @JsonProperty("offlineRecordIngestCount") String offlineRecordIngestCount,
-                              @JsonProperty("dataSourceId") String dataSourceId) {
+          @JsonProperty("offlineRecordIngestCount") String offlineRecordIngestCount,
+          @JsonProperty("dataSourceId") String dataSourceId) {
         this.dataSourceName = dataSourceName;
         this.offlineRecordIngestCount = offlineRecordIngestCount;
         this.dataSourceId = dataSourceId;
@@ -158,9 +171,16 @@ public class TectonApiResponse {
      */
     public static class FeatureViewMetric {
 
+      @JsonProperty("featureViewName")
       private final String featureViewName;
+
+      @JsonProperty("onlineRecordIngestCount")
       private final String onlineRecordIngestCount;
+
+      @JsonProperty("offlineRecordIngestCount")
       private final String offlineRecordIngestCount;
+
+      @JsonProperty("featureViewId")
       private final String featureViewId;
 
       /**
@@ -173,9 +193,9 @@ public class TectonApiResponse {
        */
       @JsonCreator
       public FeatureViewMetric(@JsonProperty("featureViewName") String featureViewName,
-                               @JsonProperty("onlineRecordIngestCount") String onlineRecordIngestCount,
-                               @JsonProperty("offlineRecordIngestCount") String offlineRecordIngestCount,
-                               @JsonProperty("featureViewId") String featureViewId) {
+          @JsonProperty("onlineRecordIngestCount") String onlineRecordIngestCount,
+          @JsonProperty("offlineRecordIngestCount") String offlineRecordIngestCount,
+          @JsonProperty("featureViewId") String featureViewId) {
         this.featureViewName = featureViewName;
         this.onlineRecordIngestCount = onlineRecordIngestCount;
         this.offlineRecordIngestCount = offlineRecordIngestCount;

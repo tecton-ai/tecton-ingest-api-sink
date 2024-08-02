@@ -1,9 +1,10 @@
 package com.tecton.ingestclient.client;
 
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tecton.ingestclient.util.JsonUtil;
+
+import java.util.List;
 
 /**
  * Represents an error response from the Tecton API. Used for deserializing JSON error responses
@@ -12,8 +13,13 @@ import com.tecton.ingestclient.util.JsonUtil;
  */
 public class TectonApiError {
 
+  @JsonProperty("requestError")
   private final RequestError requestError;
+
+  @JsonProperty("workspaceName")
   private final String workspaceName;
+
+  @JsonProperty("recordErrors")
   private final List<RecordError> recordErrors;
 
   /**
@@ -25,8 +31,8 @@ public class TectonApiError {
    */
   @JsonCreator
   public TectonApiError(@JsonProperty("requestError") RequestError requestError,
-                        @JsonProperty("workspaceName") String workspaceName,
-                        @JsonProperty("recordErrors") List<RecordError> recordErrors) {
+      @JsonProperty("workspaceName") String workspaceName,
+      @JsonProperty("recordErrors") List<RecordError> recordErrors) {
     this.requestError = requestError;
     this.workspaceName = workspaceName;
     this.recordErrors = recordErrors;
@@ -69,7 +75,10 @@ public class TectonApiError {
    */
   public static class RequestError {
 
+    @JsonProperty("errorMessage")
     private final String errorMessage;
+
+    @JsonProperty("errorType")
     private final String errorType;
 
     /**
@@ -80,7 +89,7 @@ public class TectonApiError {
      */
     @JsonCreator
     public RequestError(@JsonProperty("errorMessage") String errorMessage,
-                        @JsonProperty("errorType") String errorType) {
+        @JsonProperty("errorType") String errorType) {
       this.errorMessage = errorMessage;
       this.errorType = errorType;
     }
@@ -114,9 +123,16 @@ public class TectonApiError {
    */
   public static class RecordError {
 
+    @JsonProperty("featureViewName")
     private final String featureViewName;
+
+    @JsonProperty("pushSourceName")
     private final String pushSourceName;
+
+    @JsonProperty("errorType")
     private final String errorType;
+
+    @JsonProperty("errorMessage")
     private final String errorMessage;
 
     /**
@@ -129,9 +145,9 @@ public class TectonApiError {
      */
     @JsonCreator
     public RecordError(@JsonProperty("featureViewName") String featureViewName,
-                       @JsonProperty("pushSourceName") String pushSourceName,
-                       @JsonProperty("errorType") String errorType,
-                       @JsonProperty("errorMessage") String errorMessage) {
+        @JsonProperty("pushSourceName") String pushSourceName,
+        @JsonProperty("errorType") String errorType,
+        @JsonProperty("errorMessage") String errorMessage) {
       this.featureViewName = featureViewName;
       this.pushSourceName = pushSourceName;
       this.errorType = errorType;

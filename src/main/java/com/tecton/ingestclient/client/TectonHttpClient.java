@@ -30,7 +30,8 @@ class TectonHttpClient implements ITectonHttpClient {
   private static final String APPLICATION_JSON_VALUE = "application/json";
   private static final String TECTON_KEY_FORMAT = "Tecton-key %s";
   private static final String ENDPOINT_PATH = "/ingest";
-  private static final Set<Integer> RETRIABLE_ERROR_CODES = Set.of(408, 425, 429, 500, 502, 503, 504);
+  private static final Set<Integer> RETRIABLE_ERROR_CODES =
+      Set.of(408, 425, 429, 500, 502, 503, 504);
 
   private final URI tectonApiBaseEndpoint;
   private final HttpClient client;
@@ -116,7 +117,8 @@ class TectonHttpClient implements ITectonHttpClient {
    */
   private boolean acquireSemaphore() throws RetriableException {
     try {
-      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(), TimeUnit.SECONDS)) {
+      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(),
+          TimeUnit.SECONDS)) {
         return false;
       }
       return true;
@@ -134,14 +136,17 @@ class TectonHttpClient implements ITectonHttpClient {
    */
   private boolean acquireSemaphoreNonBlocking(CompletableFuture<?> future) {
     try {
-      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(), TimeUnit.SECONDS)) {
-        future.completeExceptionally(new RetriableException("Failed to acquire semaphore within timeout"));
+      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(),
+          TimeUnit.SECONDS)) {
+        future.completeExceptionally(
+            new RetriableException("Failed to acquire semaphore within timeout"));
         return false;
       }
       return true;
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      future.completeExceptionally(new RetriableException("Thread was interrupted while acquiring semaphore", e));
+      future.completeExceptionally(
+          new RetriableException("Thread was interrupted while acquiring semaphore", e));
       return false;
     }
   }
@@ -210,7 +215,8 @@ class TectonHttpClient implements ITectonHttpClient {
       }
     } else {
       handleErrorResponse(statusCode, responseBody);
-      return null; // This line will never be reached as handleErrorResponse will always throw an exception
+      return null; // This line will never be reached as handleErrorResponse will always throw an
+                   // exception
     }
   }
 
