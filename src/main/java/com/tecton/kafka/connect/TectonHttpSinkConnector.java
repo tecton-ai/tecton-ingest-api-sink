@@ -17,7 +17,6 @@ import com.github.jcustenborder.kafka.connect.utils.config.Title;
 
 /**
  * An HTTP Sink Connector for Kafka, which sends records to Tecton's Ingest API.
- *
  */
 @Title("Tecton HTTP Sink Connector")
 @Description("This connector is responsible for sending Kafka events to Tecton via the Ingest API.")
@@ -26,8 +25,7 @@ import com.github.jcustenborder.kafka.connect.utils.config.Title;
 @DocumentationNote("Refer to the official Tecton documentation for more details.")
 public class TectonHttpSinkConnector extends SinkConnector {
 
-  private static final Logger log = LoggerFactory.getLogger(TectonHttpSinkConnector.class);
-
+  private static final Logger LOG = LoggerFactory.getLogger(TectonHttpSinkConnector.class);
   private Map<String, String> settings;
 
   /**
@@ -38,9 +36,9 @@ public class TectonHttpSinkConnector extends SinkConnector {
    */
   @Override
   public List<Map<String, String>> taskConfigs(int maxTasks) {
-    log.info("Configuring {} tasks for the connector", maxTasks);
+    LOG.info("Configuring {} tasks for the connector", maxTasks);
 
-    List<Map<String, String>> configs = new ArrayList<>();
+    List<Map<String, String>> configs = new ArrayList<>(maxTasks);
     for (int i = 0; i < maxTasks; i++) {
       configs.add(this.settings);
     }
@@ -54,11 +52,9 @@ public class TectonHttpSinkConnector extends SinkConnector {
    */
   @Override
   public void start(Map<String, String> settings) {
-    log.info("Starting the TectonHttpSinkConnector");
-
+    LOG.info("Starting the TectonHttpSinkConnector");
     this.settings = settings;
     new TectonHttpSinkConnectorConfig(settings);
-
     // Further setup for the connector if needed
   }
 
@@ -67,7 +63,7 @@ public class TectonHttpSinkConnector extends SinkConnector {
    */
   @Override
   public void stop() {
-    log.info("Stopping the TectonHttpSinkConnector");
+    LOG.info("Stopping the TectonHttpSinkConnector");
     // Clean-up activities when stopping the connector
   }
 
@@ -98,7 +94,6 @@ public class TectonHttpSinkConnector extends SinkConnector {
    */
   @Override
   public String version() {
-    // It's important to handle versioning carefully for future compatibility
     return VersionUtil.version(this.getClass());
   }
 }

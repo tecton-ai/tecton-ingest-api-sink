@@ -1,6 +1,7 @@
 package com.tecton.ingestclient.client;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tecton.ingestclient.util.JsonUtil;
 
@@ -11,29 +12,21 @@ import com.tecton.ingestclient.util.JsonUtil;
  */
 public class TectonApiError {
 
-  @JsonProperty("requestError")
   private final RequestError requestError;
-
-  @JsonProperty("workspaceName")
   private final String workspaceName;
-
-  @JsonProperty("recordErrors")
   private final List<RecordError> recordErrors;
 
   /**
-   * Default constructor for Jackson deserialization.
-   */
-  public TectonApiError() {
-    this.requestError = null;
-    this.workspaceName = null;
-    this.recordErrors = null;
-  }
-
-  /**
    * Constructor for setting fields directly.
+   *
+   * @param requestError the request error details
+   * @param workspaceName the name of the workspace
+   * @param recordErrors the list of record errors
    */
-  public TectonApiError(RequestError requestError, String workspaceName,
-      List<RecordError> recordErrors) {
+  @JsonCreator
+  public TectonApiError(@JsonProperty("requestError") RequestError requestError,
+                        @JsonProperty("workspaceName") String workspaceName,
+                        @JsonProperty("recordErrors") List<RecordError> recordErrors) {
     this.requestError = requestError;
     this.workspaceName = workspaceName;
     this.recordErrors = recordErrors;
@@ -76,24 +69,18 @@ public class TectonApiError {
    */
   public static class RequestError {
 
-    @JsonProperty("errorMessage")
     private final String errorMessage;
-
-    @JsonProperty("errorType")
     private final String errorType;
 
     /**
-     * Default constructor for Jackson deserialization.
-     */
-    public RequestError() {
-      this.errorMessage = null;
-      this.errorType = null;
-    }
-
-    /**
      * Constructor for setting fields directly.
+     *
+     * @param errorMessage the error message
+     * @param errorType the type of error
      */
-    public RequestError(String errorMessage, String errorType) {
+    @JsonCreator
+    public RequestError(@JsonProperty("errorMessage") String errorMessage,
+                        @JsonProperty("errorType") String errorType) {
       this.errorMessage = errorMessage;
       this.errorType = errorType;
     }
@@ -127,33 +114,24 @@ public class TectonApiError {
    */
   public static class RecordError {
 
-    @JsonProperty("featureViewName")
     private final String featureViewName;
-
-    @JsonProperty("pushSourceName")
     private final String pushSourceName;
-
-    @JsonProperty("errorType")
     private final String errorType;
-
-    @JsonProperty("errorMessage")
     private final String errorMessage;
 
     /**
-     * Default constructor for Jackson deserialization.
-     */
-    public RecordError() {
-      this.featureViewName = null;
-      this.pushSourceName = null;
-      this.errorType = null;
-      this.errorMessage = null;
-    }
-
-    /**
      * Constructor for setting fields directly.
+     *
+     * @param featureViewName the name of the feature view
+     * @param pushSourceName the name of the push source
+     * @param errorType the type of error
+     * @param errorMessage the error message
      */
-    public RecordError(String featureViewName, String pushSourceName, String errorType,
-        String errorMessage) {
+    @JsonCreator
+    public RecordError(@JsonProperty("featureViewName") String featureViewName,
+                       @JsonProperty("pushSourceName") String pushSourceName,
+                       @JsonProperty("errorType") String errorType,
+                       @JsonProperty("errorMessage") String errorMessage) {
       this.featureViewName = featureViewName;
       this.pushSourceName = pushSourceName;
       this.errorType = errorType;

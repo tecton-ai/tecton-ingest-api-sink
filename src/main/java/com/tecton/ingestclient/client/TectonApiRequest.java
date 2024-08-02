@@ -1,14 +1,11 @@
 package com.tecton.ingestclient.client;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tecton.ingestclient.converter.TectonRecord;
 import com.tecton.ingestclient.util.JsonUtil;
+
+import java.util.*;
 
 /**
  * Represents the request payload for the Tecton API.
@@ -17,11 +14,8 @@ public class TectonApiRequest {
 
   @JsonProperty("workspace_name")
   private final String workspaceName;
-
   @JsonProperty("dry_run")
   private final boolean dryRun;
-
-  @JsonProperty("records")
   private final Map<String, List<TectonRecord>> records;
 
   /**
@@ -31,11 +25,13 @@ public class TectonApiRequest {
    * @param dryRun indicates if it's a dry run.
    * @param records the records associated with the request. Must not be null.
    */
-  public TectonApiRequest(String workspaceName, boolean dryRun,
-      Map<String, List<TectonRecord>> records) {
+  @JsonCreator
+  public TectonApiRequest(@JsonProperty("workspace_name") String workspaceName,
+                          @JsonProperty("dry_run") boolean dryRun,
+                          @JsonProperty("records") Map<String, List<TectonRecord>> records) {
     this.workspaceName = Objects.requireNonNull(workspaceName, "Workspace name cannot be null.");
     this.dryRun = dryRun;
-    this.records = Collections.unmodifiableMap(new HashMap<>(records));
+    this.records = Collections.unmodifiableMap(new HashMap<>(Objects.requireNonNull(records, "Records cannot be null.")));
   }
 
   /**
@@ -83,6 +79,7 @@ public class TectonApiRequest {
    * Represents a wrapper around the record data.
    */
   public static class RecordWrapper {
+
     private final String pushSource;
     private final TectonRecord record;
 
@@ -179,7 +176,7 @@ public class TectonApiRequest {
      * @return true if there are records, otherwise false.
      */
     public boolean hasRecords() {
-      return !this.records.isEmpty();
+      return !records.isEmpty();
     }
 
     /**
@@ -197,7 +194,7 @@ public class TectonApiRequest {
      * @return this builder.
      */
     public Builder clearRecords() {
-      this.records.clear();
+      records.clear();
       return this;
     }
   }

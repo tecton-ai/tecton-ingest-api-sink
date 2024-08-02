@@ -2,6 +2,7 @@ package com.tecton.ingestclient.converter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.apache.kafka.connect.errors.DataException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +22,7 @@ public class TectonRecord {
    * @param recordData The main record data. This data maps field names to their respective values.
    */
   public TectonRecord(final Map<String, Object> recordData) {
-    this.recordData = recordData;
+    this.recordData = Objects.requireNonNull(recordData, "Record data cannot be null.");
   }
 
   /**
@@ -51,16 +52,15 @@ public class TectonRecord {
    * @return True if the object is a valid Tecton type; false otherwise.
    */
   private static boolean isValidTectonValue(final Object value) {
-    if (value == null || value instanceof String || value instanceof Number
-        || value instanceof Boolean) {
+    if (value == null || value instanceof String || value instanceof Number || value instanceof Boolean) {
       return true;
     }
     if (value instanceof List) {
       return ((List<?>) value).stream().allMatch(TectonRecord::isValidTectonValue);
     }
     if (value instanceof Map) {
-      return ((Map<?, ?>) value).keySet().stream().allMatch(key -> key instanceof String)
-          && ((Map<?, ?>) value).values().stream().allMatch(TectonRecord::isValidTectonValue);
+      return ((Map<?, ?>) value).keySet().stream().allMatch(key -> key instanceof String) &&
+             ((Map<?, ?>) value).values().stream().allMatch(TectonRecord::isValidTectonValue);
     }
     return false;
   }

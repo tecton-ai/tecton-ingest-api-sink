@@ -12,10 +12,10 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import org.apache.kafka.connect.errors.ConnectException;
-import org.apache.kafka.connect.errors.DataException;
 import org.apache.kafka.connect.errors.RetriableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.tecton.ingestclient.util.JsonUtil;
 import com.tecton.kafka.connect.TectonHttpSinkConnectorConfig;
 
@@ -30,8 +30,7 @@ class TectonHttpClient implements ITectonHttpClient {
   private static final String APPLICATION_JSON_VALUE = "application/json";
   private static final String TECTON_KEY_FORMAT = "Tecton-key %s";
   private static final String ENDPOINT_PATH = "/ingest";
-  private static final Set<Integer> RETRIABLE_ERROR_CODES =
-      Set.of(408, 425, 429, 500, 502, 503, 504);
+  private static final Set<Integer> RETRIABLE_ERROR_CODES = Set.of(408, 425, 429, 500, 502, 503, 504);
 
   private final URI tectonApiBaseEndpoint;
   private final HttpClient client;
@@ -39,7 +38,7 @@ class TectonHttpClient implements ITectonHttpClient {
   private final Semaphore concurrencySemaphore;
 
   /**
-   * Initializes a new instance of {@code TectonHttpClientImpl}.
+   * Initializes a new instance of {@code TectonHttpClient}.
    *
    * @param config The configuration object containing details such as the base endpoint of the
    *        Tecton API, the API key for authentication, connection timeout, and request timeout.
@@ -57,7 +56,9 @@ class TectonHttpClient implements ITectonHttpClient {
   public TectonApiResponse sendSync(TectonApiRequest requestData)
       throws ConnectException, RetriableException {
     LOG.debug("Sending synchronous request to Tecton Ingest API");
-    acquireSemaphore();
+    if (!acquireSemaphore()) {
+      throw new RetriableException("Failed to acquire semaphore within timeout");
+    }
     try {
       HttpRequest request = constructHttpRequest(requestData);
       long startTime = System.currentTimeMillis();
@@ -68,7 +69,7 @@ class TectonHttpClient implements ITectonHttpClient {
           endTime - startTime, apiResponse);
       return apiResponse;
     } catch (IOException | InterruptedException e) {
-      LOG.warn("Retriable error occurred: {}", e.toString());
+      handleGoawayException(e);
       throw new RetriableException("Retriable error occurred", e);
     } finally {
       releaseSemaphore();
@@ -108,42 +109,40 @@ class TectonHttpClient implements ITectonHttpClient {
   }
 
   /**
-   * Attempts to acquire a semaphore without blocking.
+   * Attempts to acquire a semaphore for synchronous operations.
+   *
+   * @return True if the semaphore was acquired, otherwise false.
+   * @throws RetriableException If the semaphore could not be acquired within the timeout.
+   */
+  private boolean acquireSemaphore() throws RetriableException {
+    try {
+      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(), TimeUnit.SECONDS)) {
+        return false;
+      }
+      return true;
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new RetriableException("Thread was interrupted while acquiring semaphore", e);
+    }
+  }
+
+  /**
+   * Attempts to acquire a semaphore for asynchronous operations without blocking.
    *
    * @param future The future to complete if semaphore acquisition fails.
    * @return True if the semaphore was acquired, otherwise false.
    */
   private boolean acquireSemaphoreNonBlocking(CompletableFuture<?> future) {
     try {
-      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(),
-          TimeUnit.SECONDS)) {
-        future.completeExceptionally(
-            new RetriableException("Failed to acquire semaphore within timeout"));
+      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(), TimeUnit.SECONDS)) {
+        future.completeExceptionally(new RetriableException("Failed to acquire semaphore within timeout"));
         return false;
       }
       return true;
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      future.completeExceptionally(
-          new RetriableException("Thread was interrupted while acquiring semaphore", e));
+      future.completeExceptionally(new RetriableException("Thread was interrupted while acquiring semaphore", e));
       return false;
-    }
-  }
-
-  /**
-   * Acquires the semaphore, blocking until it is available or the timeout is reached.
-   *
-   * @throws RetriableException If the semaphore could not be acquired within the timeout.
-   */
-  private void acquireSemaphore() throws RetriableException {
-    try {
-      if (!concurrencySemaphore.tryAcquire(config.httpRequestTimeout.toSeconds(),
-          TimeUnit.SECONDS)) {
-        throw new RetriableException("Failed to acquire semaphore within timeout");
-      }
-    } catch (InterruptedException e) {
-      Thread.currentThread().interrupt();
-      throw new RetriableException("Thread was interrupted while acquiring semaphore", e);
     }
   }
 
@@ -163,15 +162,8 @@ class TectonHttpClient implements ITectonHttpClient {
    */
   private Void handleAsyncException(Throwable e, CompletableFuture<TectonApiResponse> future) {
     releaseSemaphore();
-    Throwable cause = e.getCause();
-    if (cause instanceof IOException && cause.getMessage().contains("GOAWAY received")) {
-      LOG.warn("GOAWAY received, triggering Kafka Connect retry mechanism.");
-      future.completeExceptionally(
-          new RetriableException("Retriable error occurred: GOAWAY received", cause));
-    } else {
-      LOG.error("Error during asynchronous request: {}", e.toString());
-      future.completeExceptionally(e);
-    }
+    handleGoawayException(e);
+    future.completeExceptionally(e);
     return null;
   }
 
@@ -192,7 +184,7 @@ class TectonHttpClient implements ITectonHttpClient {
           .POST(HttpRequest.BodyPublishers.ofString(jsonPayload)).build();
     } catch (Exception e) {
       LOG.error("Failed to convert request data to JSON", e);
-      throw new DataException("Error converting request data to JSON", e);
+      throw new ConnectException("Error converting request data to JSON", e);
     }
   }
 
@@ -210,11 +202,15 @@ class TectonHttpClient implements ITectonHttpClient {
     String responseBody = response.body();
     LOG.debug("Processing Tecton API response with status code: {}", statusCode);
     if (statusCode >= 200 && statusCode < 300) {
-      return JsonUtil.fromJson(responseBody, TectonApiResponse.class);
+      try {
+        return JsonUtil.fromJson(responseBody, TectonApiResponse.class);
+      } catch (JsonProcessingException e) {
+        LOG.error("Error parsing successful response body as JSON: {}", responseBody, e);
+        throw new ConnectException("Error parsing successful response as JSON", e);
+      }
     } else {
       handleErrorResponse(statusCode, responseBody);
-      return null; // This line will never be reached as handleErrorResponse will always throw an
-                   // exception
+      return null; // This line will never be reached as handleErrorResponse will always throw an exception
     }
   }
 
@@ -231,9 +227,11 @@ class TectonHttpClient implements ITectonHttpClient {
     try {
       TectonApiError error = JsonUtil.fromJson(responseBody, TectonApiError.class);
       logApiError(error);
-    } catch (DataException e) {
-      LOG.error("Failed to parse error response body: {}", responseBody, e);
+    } catch (JsonProcessingException e) {
+      LOG.error("Raw error response body: {}", responseBody);
+      throw new ConnectException("Error parsing error response as JSON", e);
     }
+
     if (RETRIABLE_ERROR_CODES.contains(statusCode)) {
       LOG.warn("Retriable error from Tecton API with status code: {}", statusCode);
       throw new RetriableException(
@@ -252,9 +250,22 @@ class TectonHttpClient implements ITectonHttpClient {
    */
   private void logApiError(TectonApiError error) {
     if (error.getRecordErrors() != null && !error.getRecordErrors().isEmpty()) {
-      error.getRecordErrors().forEach(err -> LOG.error("Error from Tecton API: {}", error));
+      error.getRecordErrors().forEach(err -> LOG.error("Error from Tecton API: {}", err));
     } else if (error.getRequestError() != null) {
       LOG.error("Request Error from Tecton API: {}", error);
+    }
+  }
+
+  /**
+   * Handles GOAWAY exception, marking it as retriable.
+   *
+   * @param e The exception to check.
+   */
+  private void handleGoawayException(Throwable e) {
+    Throwable cause = e.getCause();
+    if (cause instanceof IOException && cause.getMessage().contains("GOAWAY received")) {
+      LOG.warn("GOAWAY received, triggering Kafka Connect retry mechanism.");
+      throw new RetriableException("Retriable error occurred: GOAWAY received", cause);
     }
   }
 }

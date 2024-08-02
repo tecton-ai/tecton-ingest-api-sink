@@ -28,18 +28,27 @@ public class TectonHttpSinkTask extends SinkTask {
   /** Processor for Kafka records. */
   private IRecordProcessor recordProcessor;
 
+  /**
+   * Starts the Tecton HTTP Sink Task.
+   *
+   * @param settings the configuration settings for the task
+   */
   @Override
   public void start(final Map<String, String> settings) {
     LOG.info("Starting TectonHttpSinkTask");
 
     config = new TectonHttpSinkConnectorConfig(settings);
     ITectonHttpClient httpClient = ITectonHttpClient.create(config);
-    recordProcessor =
-        new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
+    recordProcessor = new BatchRecordProcessor(httpClient, initialiseErrantRecordReporter(), config);
 
     LOG.info("TectonHttpSinkTask initialised successfully");
   }
 
+  /**
+   * Puts the records to be processed by the sink task.
+   *
+   * @param records the collection of sink records to be processed
+   */
   @Override
   public void put(final Collection<SinkRecord> records) {
     if (records.isEmpty()) {
@@ -50,24 +59,37 @@ public class TectonHttpSinkTask extends SinkTask {
     LOG.info("Processing {} records", records.size());
     try {
       int successfulRecords = recordProcessor.processRecords(records);
-      LOG.info("Successfully processed {} out of {} records", successfulRecords, records.size());
+      LOG.info("Successfully sent {} out of {} records", successfulRecords, records.size());
     } catch (ConnectException e) {
       LOG.error("Error processing records", e);
       throw e;
     }
   }
 
+  /**
+   * Flushes the data for the specified offsets.
+   *
+   * @param offsets the offsets to be flushed
+   */
   @Override
   public void flush(final Map<TopicPartition, OffsetAndMetadata> offsets) {
     LOG.debug("Flushing data");
   }
 
+  /**
+   * Stops the Tecton HTTP Sink Task.
+   */
   @Override
   public void stop() {
     LOG.info("Stopping TectonHttpSinkTask");
     recordProcessor.close();
   }
 
+  /**
+   * Returns the version of the Tecton HTTP Sink Task.
+   *
+   * @return the version string
+   */
   @Override
   public String version() {
     return VersionUtil.version(this.getClass());

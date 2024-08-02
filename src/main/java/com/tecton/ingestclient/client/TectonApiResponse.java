@@ -1,6 +1,7 @@
 package com.tecton.ingestclient.client;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tecton.ingestclient.util.JsonUtil;
 
@@ -11,24 +12,18 @@ import com.tecton.ingestclient.util.JsonUtil;
  */
 public class TectonApiResponse {
 
-  @JsonProperty("workspaceName")
   private final String workspaceName;
-
-  @JsonProperty("ingestMetrics")
   private final IngestMetrics ingestMetrics;
 
   /**
-   * Default constructor used by Jackson for deserialization.
-   */
-  public TectonApiResponse() {
-    this.workspaceName = null;
-    this.ingestMetrics = null;
-  }
-
-  /**
    * Constructor for setting fields directly.
+   *
+   * @param workspaceName the name of the workspace
+   * @param ingestMetrics the ingestion metrics
    */
-  public TectonApiResponse(String workspaceName, IngestMetrics ingestMetrics) {
+  @JsonCreator
+  public TectonApiResponse(@JsonProperty("workspaceName") String workspaceName,
+                           @JsonProperty("ingestMetrics") IngestMetrics ingestMetrics) {
     this.workspaceName = workspaceName;
     this.ingestMetrics = ingestMetrics;
   }
@@ -61,25 +56,18 @@ public class TectonApiResponse {
    */
   public static class IngestMetrics {
 
-    @JsonProperty("featureViewIngestMetrics")
     private final List<FeatureViewMetric> featureViewIngestMetrics;
-
-    @JsonProperty("dataSourceIngestMetrics")
     private final List<DataSourceMetric> dataSourceIngestMetrics;
 
     /**
-     * Default constructor for Jackson deserialization.
-     */
-    public IngestMetrics() {
-      this.featureViewIngestMetrics = null;
-      this.dataSourceIngestMetrics = null;
-    }
-
-    /**
      * Constructor for setting fields directly.
+     *
+     * @param featureViewIngestMetrics the list of feature view metrics
+     * @param dataSourceIngestMetrics the list of data source metrics
      */
-    public IngestMetrics(List<FeatureViewMetric> featureViewIngestMetrics,
-        List<DataSourceMetric> dataSourceIngestMetrics) {
+    @JsonCreator
+    public IngestMetrics(@JsonProperty("featureViewIngestMetrics") List<FeatureViewMetric> featureViewIngestMetrics,
+                         @JsonProperty("dataSourceIngestMetrics") List<DataSourceMetric> dataSourceIngestMetrics) {
       this.featureViewIngestMetrics = featureViewIngestMetrics;
       this.dataSourceIngestMetrics = dataSourceIngestMetrics;
     }
@@ -112,29 +100,21 @@ public class TectonApiResponse {
      */
     public static class DataSourceMetric {
 
-      @JsonProperty("dataSourceName")
       private final String dataSourceName;
-
-      @JsonProperty("offlineRecordIngestCount")
       private final String offlineRecordIngestCount;
-
-      @JsonProperty("dataSourceId")
       private final String dataSourceId;
 
       /**
-       * Default constructor for Jackson deserialization.
-       */
-      public DataSourceMetric() {
-        this.dataSourceName = null;
-        this.offlineRecordIngestCount = null;
-        this.dataSourceId = null;
-      }
-
-      /**
        * Constructor for setting fields directly.
+       *
+       * @param dataSourceName the name of the data source
+       * @param offlineRecordIngestCount the count of offline records ingested
+       * @param dataSourceId the ID of the data source
        */
-      public DataSourceMetric(String dataSourceName, String offlineRecordIngestCount,
-          String dataSourceId) {
+      @JsonCreator
+      public DataSourceMetric(@JsonProperty("dataSourceName") String dataSourceName,
+                              @JsonProperty("offlineRecordIngestCount") String offlineRecordIngestCount,
+                              @JsonProperty("dataSourceId") String dataSourceId) {
         this.dataSourceName = dataSourceName;
         this.offlineRecordIngestCount = offlineRecordIngestCount;
         this.dataSourceId = dataSourceId;
@@ -178,33 +158,24 @@ public class TectonApiResponse {
      */
     public static class FeatureViewMetric {
 
-      @JsonProperty("featureViewName")
       private final String featureViewName;
-
-      @JsonProperty("onlineRecordIngestCount")
       private final String onlineRecordIngestCount;
-
-      @JsonProperty("offlineRecordIngestCount")
       private final String offlineRecordIngestCount;
-
-      @JsonProperty("featureViewId")
       private final String featureViewId;
 
       /**
-       * Default constructor for Jackson deserialization.
-       */
-      public FeatureViewMetric() {
-        this.featureViewName = null;
-        this.onlineRecordIngestCount = null;
-        this.offlineRecordIngestCount = null;
-        this.featureViewId = null;
-      }
-
-      /**
        * Constructor for setting fields directly.
+       *
+       * @param featureViewName the name of the feature view
+       * @param onlineRecordIngestCount the count of online records ingested
+       * @param offlineRecordIngestCount the count of offline records ingested
+       * @param featureViewId the ID of the feature view
        */
-      public FeatureViewMetric(String featureViewName, String onlineRecordIngestCount,
-          String offlineRecordIngestCount, String featureViewId) {
+      @JsonCreator
+      public FeatureViewMetric(@JsonProperty("featureViewName") String featureViewName,
+                               @JsonProperty("onlineRecordIngestCount") String onlineRecordIngestCount,
+                               @JsonProperty("offlineRecordIngestCount") String offlineRecordIngestCount,
+                               @JsonProperty("featureViewId") String featureViewId) {
         this.featureViewName = featureViewName;
         this.onlineRecordIngestCount = onlineRecordIngestCount;
         this.offlineRecordIngestCount = offlineRecordIngestCount;

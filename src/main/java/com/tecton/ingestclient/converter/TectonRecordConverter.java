@@ -116,7 +116,7 @@ public class TectonRecordConverter implements IRecordConverter {
     original.forEach((key, value) -> {
       String cleanKey = key.replaceAll("[^a-zA-Z0-9_]", "_").replaceAll("^\\d+", "_$0");
       if (!key.equals(cleanKey)) {
-        LOG.debug("Sanitized key '{}' to '{}'.", key, cleanKey);
+        LOG.debug("Sanitised key '{}' to '{}'.", key, cleanKey);
       }
 
       if (value instanceof Map) {
@@ -143,7 +143,8 @@ public class TectonRecordConverter implements IRecordConverter {
       recordData.put("kafka_key", record.key() != null ? extractKeyData(record) : null);
     }
     if (config.kafkaTimestampEnabled) {
-      recordData.put("kafka_timestamp", record.timestamp() != null ? formatTimestamp(record.timestamp()) : null);
+      recordData.put("kafka_timestamp",
+          record.timestamp() != null ? formatTimestamp(record.timestamp()) : null);
     }
     if (config.kafkaHeadersEnabled) {
       Map<String, String> headers = extractHeaders(record);

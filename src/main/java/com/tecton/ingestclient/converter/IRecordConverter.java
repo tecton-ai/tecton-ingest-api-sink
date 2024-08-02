@@ -6,10 +6,9 @@ import org.apache.kafka.connect.sink.SinkRecord;
  * Defines a mechanism to convert Kafka's {@code SinkRecord} to {@code TectonRecord} for ingestion.
  *
  * <p>
- * Implementations of this interface should provide mechanisms to handle the transformation of Kafka
- * records to the format required by the Tecton system. This conversion can involve data mapping,
- * transformations, and other necessary processing steps to facilitate the ingestion of data into
- * Tecton.
+ * Implementations of this interface should handle the transformation of Kafka records to the format
+ * required by the Tecton system, including data mapping, transformations, and other necessary
+ * processing steps to facilitate data ingestion into Tecton.
  * </p>
  */
 public interface IRecordConverter {

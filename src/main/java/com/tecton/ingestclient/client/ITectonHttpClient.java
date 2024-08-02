@@ -1,4 +1,5 @@
 package com.tecton.ingestclient.client;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import org.apache.kafka.connect.errors.ConnectException;
@@ -35,8 +36,7 @@ public interface ITectonHttpClient {
    * @param batchRequestData The list of request data to be sent.
    * @return A list of CompletableFutures representing the API responses.
    */
-  List<CompletableFuture<TectonApiResponse>> sendAsyncBatch(
-      List<TectonApiRequest> batchRequestData);
+  List<CompletableFuture<TectonApiResponse>> sendAsyncBatch(List<TectonApiRequest> batchRequestData);
 
   /**
    * Factory method to create an instance of TectonHttpClient.

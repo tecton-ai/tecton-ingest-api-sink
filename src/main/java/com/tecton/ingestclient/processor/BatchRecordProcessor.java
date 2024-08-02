@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.apache.kafka.connect.errors.ConnectException;
@@ -43,7 +44,8 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * @param config Configuration for the processor.
    */
   public BatchRecordProcessor(final ITectonHttpClient httpClient,
-      final ErrantRecordReporter reporter, final TectonHttpSinkConnectorConfig config) {
+                              final ErrantRecordReporter reporter, 
+                              final TectonHttpSinkConnectorConfig config) {
     this.config = config;
     this.httpClient = httpClient;
     this.reporter = Optional.ofNullable(reporter);
@@ -54,7 +56,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * Processes a collection of SinkRecords, transforms them to Tecton API requests, and sends them.
    *
    * @param records Collection of SinkRecords to be processed.
-   * @return The number of successfully processed records.
+   * @return The number of successfully sent records.
    * @throws ConnectException if a non-retriable error occurs.
    * @throws RetriableException if a retriable error occurs.
    */
@@ -62,12 +64,12 @@ public class BatchRecordProcessor implements IRecordProcessor {
   public int processRecords(final Collection<SinkRecord> records)
       throws ConnectException, RetriableException {
     final List<SinkRecord> validRecords = new ArrayList<>();
-    int successCount = 0;
+    AtomicInteger processedCount = new AtomicInteger(0);
 
     for (SinkRecord record : records) {
       try {
         processSingleRecord(record, validRecords);
-        successCount++;
+        processedCount.incrementAndGet();
       } catch (Exception e) {
         reportErrantRecord(record, e);
       }
@@ -76,9 +78,31 @@ public class BatchRecordProcessor implements IRecordProcessor {
     final List<TectonApiRequest> batchRequests = partitionIntoBatches(validRecords).stream()
         .map(this::prepareBatchRequest).collect(Collectors.toList());
 
-    processBatchRequests(batchRequests);
+    AtomicInteger sentCount = new AtomicInteger(0);
 
-    return successCount;
+    try {
+      if (config.httpAsyncEnabled) {
+        List<CompletableFuture<TectonApiResponse>> futures = httpClient.sendAsyncBatch(batchRequests);
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+
+        allFutures.thenRun(() -> {
+          sentCount.addAndGet(batchRequests.stream().mapToInt(TectonApiRequest::getRecordCount).sum());
+        }).exceptionally(ex -> {
+          LOG.error("Error sending records to Tecton", ex);
+          return null;
+        }).join();
+      } else {
+        for (TectonApiRequest request : batchRequests) {
+          httpClient.sendSync(request);
+          sentCount.addAndGet(request.getRecordCount());
+        }
+      }
+    } catch (Exception e) {
+      LOG.error("Error processing batch requests", e);
+      throw new ConnectException("Failed to send records to Tecton", e);
+    }
+
+    return sentCount.get();
   }
 
   /**
@@ -130,7 +154,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
 
       requestBuilder.addRecord(wrappedRecord);
     }
-
+    
     return requestBuilder.build();
   }
 
@@ -156,7 +180,7 @@ public class BatchRecordProcessor implements IRecordProcessor {
    * @param validRecords The list of valid records to add to if valid.
    */
   private void validateAndAddRecord(final SinkRecord record, final TectonRecord tectonRecord,
-      final List<SinkRecord> validRecords) {
+                                    final List<SinkRecord> validRecords) {
     if (!tectonRecord.isValid()) {
       LOG.warn("Invalid or empty record skipped from topic: {}", record.topic());
       reportErrantRecord(record, new DataException("Invalid TectonRecord."));
@@ -191,46 +215,6 @@ public class BatchRecordProcessor implements IRecordProcessor {
               record.topic());
           return record.topic();
         });
-  }
-
-  /**
-   * Processes the batch requests synchronously or asynchronously depending on configuration.
-   *
-   * @param batchRequests List of TectonApiRequests to process.
-   * @throws ConnectException if a non-retriable error occurs.
-   * @throws RetriableException if a retriable error occurs.
-   */
-  private void processBatchRequests(final List<TectonApiRequest> batchRequests)
-      throws ConnectException, RetriableException {
-    if (config.httpAsyncEnabled) {
-      LOG.debug("Sending {} batches", batchRequests.size());
-      List<CompletableFuture<TectonApiResponse>> futures = httpClient.sendAsyncBatch(batchRequests);
-      futures.forEach(this::handleFuture);
-    } else {
-      for (TectonApiRequest request : batchRequests) {
-        httpClient.sendSync(request);
-      }
-    }
-  }
-
-  /**
-   * Handles asynchronous response exceptions.
-   *
-   * @param future The future representing the asynchronous operation.
-   */
-  private void handleFuture(final CompletableFuture<TectonApiResponse> future) {
-    future.exceptionally(ex -> {
-      LOG.error("Error sending batch to Tecton: {}", ex.toString());
-      LOG.debug("Error details: ", ex);
-
-      if (ex instanceof ConnectException) {
-        throw (ConnectException) ex;
-      } else if (ex instanceof RetriableException) {
-        throw (RetriableException) ex;
-      } else {
-        throw new ConnectException("Unexpected error processing batch request", ex);
-      }
-    });
   }
 
   /**

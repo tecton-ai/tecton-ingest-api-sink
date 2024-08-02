@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * strings and parse JSON strings to objects. This class is configured to ignore unknown properties
  * in JSON responses to ensure flexibility with API changes.
  */
-public class JsonUtil {
+public final class JsonUtil {
 
   private static final Logger LOG = LoggerFactory.getLogger(JsonUtil.class);
   private static final ObjectMapper OBJECT_MAPPER;
@@ -22,7 +22,7 @@ public class JsonUtil {
   }
 
   private JsonUtil() {
-    // Utility class
+    // Prevent instantiation
   }
 
   /**
@@ -36,7 +36,7 @@ public class JsonUtil {
       return OBJECT_MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
     } catch (JsonProcessingException e) {
       LOG.warn("Error converting to JSON", e);
-      return "Error converting to JSON";
+      return "{\"error\":\"Error converting to JSON\"}";
     }
   }
 
@@ -47,15 +47,10 @@ public class JsonUtil {
    * @param valueType the class of the type to parse the JSON string to.
    * @param <T> the type of the object to return.
    * @return the object parsed from the JSON string.
-   * @throws RuntimeException if there is an error parsing the JSON string.
+   * @throws JsonProcessingException if there is an error parsing the JSON string.
    */
-  public static <T> T fromJson(String json, Class<T> valueType) {
-    try {
-      return OBJECT_MAPPER.readValue(json, valueType);
-    } catch (JsonProcessingException e) {
-      LOG.error("Error parsing JSON", e);
-      throw new RuntimeException("Error parsing JSON", e);
-    }
+  public static <T> T fromJson(String json, Class<T> valueType) throws JsonProcessingException {
+    return OBJECT_MAPPER.readValue(json, valueType);
   }
 
   /**
